@@ -11,11 +11,7 @@ import Button from "./Button.jsx";
 
 const Home = () => {
   const [bookings, setBookings] = useState([]);
-  const [date, setDate] = useState({
-    startDate: new Date(),
-    endDate: new Date(),
-    key: "selection",
-  });
+
   const [dateRange, setDateRange] = useState([
     {
       startDate: new Date(),
@@ -55,17 +51,33 @@ const Home = () => {
     return eachDayOfInterval({ start, end });
   });
 
-  console.log("Final disabled dates array:", disabledDates);
-
   const isDisabledDate = (date) =>
-    Array.isArray(disabledDates) &&
     disabledDates.some(
       (disabledDate) => date.toDateString() === disabledDate.toDateString()
     );
 
   const handleSelect = (ranges) => {
-    setDateRange([ranges.selection]);
-    console.log("Selected range:", ranges.selection);
+    const newRange = ranges.selection;
+
+    if (
+      eachDayOfInterval({
+        start: newRange.startDate,
+        end: newRange.endDate,
+      }).some(isDisabledDate)
+    ) {
+      console.log("FAIL: Contains disabled dates.");
+      // Reset to default range or do nothing
+      setDateRange([
+        {
+          startDate: new Date(),
+          endDate: new Date(),
+          key: "selection",
+        },
+      ]);
+    } else {
+      console.log("PASS");
+      setDateRange([newRange]);
+    }
   };
 
   const containsDisabledDay = (dateRange, disabledDates) => {
@@ -103,8 +115,8 @@ const Home = () => {
       day >= dateRange[0].startDate && day <= dateRange[0].endDate;
 
     let borderRadius = "0";
-    if (isStartDate) borderRadius = "50% 0 0 50%";
-    if (isEndDate) borderRadius = "0 50% 50% 0";
+    if (isStartDate) borderRadius = "20% 0 0 20%";
+    if (isEndDate) borderRadius = "0 20% 20% 0";
 
     return (
       <div
@@ -117,10 +129,11 @@ const Home = () => {
           backgroundColor: isDisabled
             ? "red"
             : isSelected
-            ? "#d3d3d3"
+            ? "green"
             : "inherit",
-          color: isDisabled ? "white" : "inherit",
-          borderRadius: isStartDate || isEndDate ? borderRadius : "0",
+          color: isDisabled ? "white" : isSelected ? "white" : "inherit",
+          //   borderRadius: isStartDate || isEndDate ? borderRadius : "0",
+          borderRadius: "0",
         }}
       >
         {day.getDate()}
@@ -142,8 +155,7 @@ const Home = () => {
           ranges={dateRange}
           onChange={handleSelect}
           disabledDay={isDisabledDate}
-          dayContentRenderer={customDayContentRenderer} // Customize day rendering
-          //   showDateDisplay={false} // Hide the date display at the top
+          dayContentRenderer={customDayContentRenderer}
         />
         <Button
           onClick={handleSubmit}
