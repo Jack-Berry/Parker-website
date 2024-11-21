@@ -1,0 +1,21 @@
+.nav-container {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  right: -10px;
+  height: 200px;
+  width: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 3;
+  background-color: white;
+  border-radius: 5px;
+}
+
+.nav-container > Button {
+  border: 0;
+  border-bottom: 2px solid gray;
+  background-color: transparent;
+}

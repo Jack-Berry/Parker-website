@@ -2,14 +2,20 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Route, Router, Routes } from "react-router-dom";
 import "./index.css";
-import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import Home from "./components/Home";
+import Todo from "./components/Todo";
+import About from "./components/About";
+import Contact from "./components/Contact";
+import Nav from "./components/Nav";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <BrowserRouter>
     <Routes>
+      <Route path="about" element={<About />} />
+      <Route path="what-to-do" element={<Todo />} />
+      <Route path="contact" element={<Contact />} />
       <Route path="*" element={<Home />} />
     </Routes>
   </BrowserRouter>
