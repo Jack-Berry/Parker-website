@@ -45,8 +45,8 @@ const Home = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
-    }, 15000); // Change images every 4 seconds
-    return () => clearInterval(interval); // Cleanup interval on unmount
+    }, 15000);
+    return () => clearInterval(interval);
   }, [images.length]);
 
   const disabledDates = bookings.flatMap((booking) => {
@@ -183,7 +183,7 @@ const Home = () => {
         ))}
       </div>
       <div className="home-content">
-        <h1>Welcome</h1>
+        <h1>Welcome to Bwythnpreswylfa</h1>
         <DateRange
           ranges={dateRange}
           onChange={handleSelect}
@@ -207,7 +207,7 @@ const Home = () => {
             </div>
           </div>
         )}
-        <Button onClick={handleBooking} text="Next" className="tab col-c" />
+        <Button onClick={handleBooking} text="Next" className="btn" />
       </div>
       <Nav />
     </div>

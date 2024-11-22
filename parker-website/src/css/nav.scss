@@ -1,0 +1,62 @@
+/*
+**************************
+            SASS
+**************************
+*/
+@import "variables";
+/*
+************END***********
+*/
+
+.nav-container {
+  position: fixed;
+  bottom: 0;
+  // transform: translateY(-50%);
+  right: 0;
+  height: 100px;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 3;
+  background-color: $col-a;
+  border-radius: 5px;
+
+  .tab {
+    border: 0;
+    font-size: 18px;
+    // border-bottom: 2px solid gray;
+    background-color: transparent;
+    word-wrap: normal;
+    transition: border-width 0.2s linear;
+  }
+
+  .tab:hover {
+    border-bottom: 3px solid gray;
+    cursor: pointer;
+  }
+}
+
+@media (min-width: 650px) {
+  .nav-container {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    right: -5px;
+    height: 250px;
+    width: 110px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 3;
+    background-color: $col-a;
+    border-radius: 5px;
+  }
+
+  .tab {
+    font-size: 14px;
+    // width: 80%;
+  }
+}

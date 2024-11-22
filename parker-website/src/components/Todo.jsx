@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import Nav from "./Nav";
+import "../css/todo.scss";
 
 const Todo = () => {
   return (
