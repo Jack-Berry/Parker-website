@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from "react";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
-import "../css/home.css";
-import { DateRangePicker, DateRange } from "react-date-range";
+import "../css/home.scss";
+import { DateRange } from "react-date-range";
 import { eachDayOfInterval, parseISO } from "date-fns";
 import { getEvents } from "../utils/fetch.js";
 import image1 from "../assets/2.jpg";
+import image2 from "../assets/3.jpg";
+import image3 from "../assets/54.jpg";
 import Nav from "./Nav";
 import Button from "./Button.jsx";
+import ContactForm from "./ContactForm.jsx";
 
 const Home = () => {
   const [bookings, setBookings] = useState([]);
-
   const [dateRange, setDateRange] = useState([
     {
       startDate: new Date(),
@@ -19,14 +21,33 @@ const Home = () => {
       key: "selection",
     },
   ]);
+  const [formData, setFormData] = useState({
+    name: "",
+    numberOfPeople: "",
+    telephone: "",
+    email: "",
+    startDate: "",
+    endDate: "",
+  });
   const [loading, setLoading] = useState(true);
+  const [toggle, setToggle] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const images = [image1, image2, image3];
 
   useEffect(() => {
+    // Fetch bookings
     getEvents((fetchedEvents) => {
       setBookings(fetchedEvents || []);
       setLoading(false);
     });
   }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
+    }, 15000); // Change images every 4 seconds
+    return () => clearInterval(interval); // Cleanup interval on unmount
+  }, [images.length]);
 
   const disabledDates = bookings.flatMap((booking) => {
     let start = booking.start;
@@ -66,7 +87,6 @@ const Home = () => {
       }).some(isDisabledDate)
     ) {
       console.log("FAIL: Contains disabled dates.");
-      // Reset to default range or do nothing
       setDateRange([
         {
           startDate: new Date(),
@@ -74,35 +94,42 @@ const Home = () => {
           key: "selection",
         },
       ]);
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        startDate: "",
+        endDate: "",
+      }));
     } else {
       console.log("PASS");
       setDateRange([newRange]);
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        startDate: newRange.startDate.toISOString(),
+        endDate: newRange.endDate.toISOString(),
+      }));
     }
   };
 
-  const containsDisabledDay = (dateRange, disabledDates) => {
+  const handleFormChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]: value,
+    }));
+  };
+
+  const handleBooking = () => {
     const { startDate, endDate } = dateRange[0];
 
-    // Generate all dates within the selected range
-    const allDatesInRange = eachDayOfInterval({
-      start: startDate,
-      end: endDate,
-    });
-
-    // Check if any date in the range matches a disabled date
-    return allDatesInRange.some((date) =>
-      disabledDates.some(
-        (disabledDate) => date.toDateString() === disabledDate.toDateString()
-      )
-    );
-  };
-
-  const handleSubmit = () => {
-    if (!containsDisabledDay(dateRange, disabledDates)) {
-      console.log("PASS");
-    } else {
-      console.log("FAIL");
+    if (
+      !startDate ||
+      !endDate ||
+      startDate.toDateString() === new Date().toDateString()
+    ) {
+      alert("Please select a valid date range before proceeding.");
+      return;
     }
+    setToggle(!toggle);
   };
 
   const customDayContentRenderer = (day) => {
@@ -132,8 +159,7 @@ const Home = () => {
             ? "green"
             : "inherit",
           color: isDisabled ? "white" : isSelected ? "white" : "inherit",
-          //   borderRadius: isStartDate || isEndDate ? borderRadius : "0",
-          borderRadius: "0",
+          borderRadius: isStartDate || isEndDate ? borderRadius : "0",
         }}
       >
         {day.getDate()}
@@ -144,11 +170,18 @@ const Home = () => {
   if (loading) return <div>Loading...</div>;
 
   return (
-    <div
-      className="home-container"
-      style={{ backgroundImage: `url(${image1})` }}
-    >
-      {" "}
+    <div className="home-container">
+      <div className="background-container">
+        {images.map((image, index) => (
+          <div
+            key={index}
+            className={`background-image ${
+              index === currentImageIndex ? "visible" : ""
+            }`}
+            style={{ backgroundImage: `url(${image})` }}
+          ></div>
+        ))}
+      </div>
       <div className="home-content">
         <h1>Welcome</h1>
         <DateRange
@@ -157,11 +190,24 @@ const Home = () => {
           disabledDay={isDisabledDate}
           dayContentRenderer={customDayContentRenderer}
         />
-        <Button
-          onClick={handleSubmit}
-          text={"Submit Booking"}
-          className={"tab col-c"}
-        />
+        {toggle && (
+          <div className="contact-form-container">
+            <ContactForm formData={formData} handleChange={handleFormChange} />
+            <div className="contact-button-container">
+              <Button
+                onClick={() => alert("Submit Booking")}
+                text="Submit Booking"
+                className="tab col-c"
+              />
+              <Button
+                onClick={() => setToggle(false)}
+                text="Cancel"
+                className="tab col-c"
+              />
+            </div>
+          </div>
+        )}
+        <Button onClick={handleBooking} text="Next" className="tab col-c" />
       </div>
       <Nav />
     </div>
