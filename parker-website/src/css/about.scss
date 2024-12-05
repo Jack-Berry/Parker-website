@@ -75,6 +75,7 @@
 
 .view-options {
   margin-bottom: 20px;
+  display: none;
 }
 
 .view-options button {
@@ -114,8 +115,19 @@
   .image-gallery-image {
     object-fit: cover;
     width: 100%;
-    height: 800px;
+    height: auto; /* Ensure the height scales dynamically */
     border-radius: 10px;
+  }
+}
+
+.image-gallery-thumbnails-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+
+  .image-gallery-thumbnail {
+    width: 60px; /* Smaller thumbnails for mobile */
+    height: 60px;
   }
 }
 
@@ -140,7 +152,47 @@
   }
 }
 
+/* Mobile-Specific Adjustments */
+@media (max-width: 768px) {
+  .image-gallery {
+    padding: 0 10px; /* Add some padding for smaller screens */
+
+    .image-gallery-image {
+      height: 400px; /* Scale down image height for smaller viewports */
+    }
+
+    .image-gallery-thumbnails-wrapper {
+      margin-top: 5px;
+
+      .image-gallery-thumbnail {
+        width: 50px; /* Further reduce thumbnail size for mobile */
+        height: 50px;
+      }
+    }
+  }
+  .image-gallery-play-button,
+  .image-gallery-fullscreen-button {
+    display: none; /* Hide fullscreen/play buttons on mobile */
+  }
+}
+
+/* Extra-Small Screens */
+@media (max-width: 480px) {
+  .image-gallery {
+    .image-gallery-image {
+      height: 300px; /* Further adjust for very small screens */
+    }
+
+    .image-gallery-thumbnails-wrapper {
+      display: none; /* Hide thumbnails for extra-small screens */
+    }
+  }
+}
+
 @media (min-width: 650px) {
+  .view-options {
+    display: block;
+  }
 }
 
 @media (min-width: 900px) {

@@ -14,7 +14,6 @@ import image6 from "../assets/IMG-20240520-WA0009.jpg";
 import image7 from "../assets/IMG-20240528-WA0000.jpg";
 import image8 from "../assets/SmartSelect_20240225_201528_Airbnb.jpg";
 import image9 from "../assets/SmartSelect_20240225_201536_Airbnb.jpg";
-import Nav from "./Nav";
 import Button from "./Button.jsx";
 import ContactForm from "./ContactForm.jsx";
 import emailjs from "emailjs-com";
