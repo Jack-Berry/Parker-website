@@ -12,9 +12,25 @@
   position: absolute;
   height: 100%;
   width: 100%;
-  background-color: $col-b;
+  // background-color: $col-b;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  // justify-content: space-between;
   align-items: center;
+
+  h1 {
+    color: black;
+  }
+}
+
+.surrounding-container {
+  p {
+    text-align: left;
+  }
+}
+
+.recommendations-container {
+  p {
+    text-align: left;
+  }
 }

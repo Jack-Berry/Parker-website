@@ -1,0 +1,29 @@
+/*
+**************************
+            SASS
+**************************
+*/
+@import "variables";
+/*
+************END***********
+*/
+
+footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: black;
+
+  .btn {
+    height: 25px;
+    width: 100px;
+    border: none;
+    background-color: transparent;
+    color: white;
+  }
+}

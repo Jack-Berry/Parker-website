@@ -31,6 +31,18 @@ const ContactForm = ({ formData, handleChange }) => {
       </div>
 
       <div className="contact-field">
+        <label htmlFor="numberOfPets">Number of Pets:</label>
+        <input
+          type="number"
+          id="numberOfPets"
+          name="numberOfPets"
+          value={formData.numberOfPets}
+          onChange={handleChange}
+          className="contact-input"
+        />
+      </div>
+
+      <div className="contact-field">
         <label htmlFor="telephone">Telephone:</label>
         <input
           type="tel"
@@ -53,6 +65,18 @@ const ContactForm = ({ formData, handleChange }) => {
           onChange={handleChange}
           required
           className="contact-input"
+        />
+      </div>
+
+      <div className="contact-field">
+        <label htmlFor="message">Message:</label>
+        <textarea
+          id="message"
+          name="message"
+          value={formData.message}
+          onChange={handleChange}
+          className="contact-textarea"
+          placeholder="Add any additional details or requests here..."
         />
       </div>
 

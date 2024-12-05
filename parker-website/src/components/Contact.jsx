@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import Nav from "./Nav";
-import emailjs from "emailjs-com";
 import "../css/contact.scss";
 
 const Contact = () => {
@@ -10,7 +9,7 @@ const Contact = () => {
     message: "",
   });
 
-  const submitButton = document.getElementById("submit-button");
+  const [successMessage, setSuccessMessage] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -19,35 +18,36 @@ const Contact = () => {
     });
   };
 
-  const handleSubmit = (e) => {
-    const serviceId = "Parker";
-    const templateId = "ID";
-    const publicKey = "Key";
-
-    const templateParams = {
-      from_name: formData.name,
-      reply_to: formData.email,
-      to_name: "Jack",
-      message: formData.message,
-    };
-
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    submitButton.textContent = "Sending...";
 
-    emailjs
-      .send(serviceId, templateId, templateParams, publicKey)
-      .then((response) => {
-        console.log("Email sent!", response);
+    try {
+      const response = await fetch("https://formspree.io/f/xyzyndzo", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
         setFormData({
           name: "",
           email: "",
           message: "",
         });
-        submitButton.textContent = "Send";
-      })
-      .catch((error) => {
-        console.error("error sending email", error);
-      });
+        setSuccessMessage(true);
+
+        // Hide the success message after 5 seconds
+        setTimeout(() => {
+          setSuccessMessage(false);
+        }, 5000);
+      } else {
+        console.error("Error sending message.");
+      }
+    } catch (error) {
+      console.error("Error submitting the form:", error);
+    }
   };
 
   return (
@@ -95,8 +95,11 @@ const Contact = () => {
             Send
           </button>
         </form>
+        {successMessage && (
+          <p className="success-message">Message sent successfully!</p>
+        )}
       </div>
-      <Nav />
+      {/* <Nav /> */}
     </div>
   );
 };
