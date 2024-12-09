@@ -5,6 +5,7 @@ import "../css/home.scss";
 import { DateRange } from "react-date-range";
 import { eachDayOfInterval, parseISO } from "date-fns";
 import { getEvents } from "../utils/fetch.js";
+import logo from "../assets/Bwythn_Preswylfa_Logo_Enhanced.png";
 import image1 from "../assets/2.jpg";
 import image2 from "../assets/3.jpg";
 import image3 from "../assets/54.jpg";
@@ -296,6 +297,7 @@ const Home = () => {
         ))}
       </div>
       <div className="home-content">
+        <img src={logo} className="logo" />
         <h1>Welcome to Bwythnpreswylfa</h1>
         <DateRange
           ranges={dateRange}

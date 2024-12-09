@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter, Route, Router, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import "./index.css";
 import reportWebVitals from "./reportWebVitals";
 import Home from "./components/Home";
@@ -10,6 +10,12 @@ import Contact from "./components/Contact";
 import Footer from "./components/Footer";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Nav from "./components/Nav";
+
+const FooterWithCondition = () => {
+  const location = useLocation();
+  const hideFooterOnPaths = ["/"]; // Add paths where the footer should be hidden
+  return hideFooterOnPaths.includes(location.pathname) ? null : <Footer />;
+};
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -22,7 +28,7 @@ root.render(
       <Route path="*" element={<Home />} />
     </Routes>
     <Nav />
-    <Footer />
+    <FooterWithCondition />
   </BrowserRouter>
 );
 

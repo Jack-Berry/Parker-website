@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import "../css/admin.scss";
+import logo from "../assets/Bwythn_Preswylfa_Logo_Enhanced.png";
 
 const Login = ({ setToken }) => {
   const [username, setUsername] = useState("");
@@ -21,8 +23,9 @@ const Login = ({ setToken }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
+    <form onSubmit={handleSubmit} className="login-container">
+      <img src={logo} className="logo" />
+      <div className="login-box">
         <label>Username:</label>
         <input
           type="text"
@@ -31,7 +34,7 @@ const Login = ({ setToken }) => {
           required
         />
       </div>
-      <div>
+      <div className="login-box">
         <label>Password:</label>
         <input
           type="password"

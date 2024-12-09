@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Nav from "./Nav";
+import logo from "../assets/Bwythn_Preswylfa_Logo_Enhanced.png";
 import "../css/contact.scss";
 
 const Contact = () => {
@@ -52,6 +52,7 @@ const Contact = () => {
 
   return (
     <div className="contact-container">
+      <img src={logo} className="logo" />
       <h1>Contact</h1>
       <div className="contact-content">
         <form className="contact-form" onSubmit={handleSubmit}>

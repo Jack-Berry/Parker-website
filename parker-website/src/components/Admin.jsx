@@ -1,82 +1,170 @@
 import React, { useState, useEffect } from "react";
-import Nav from "./Nav";
+import { Calendar, momentLocalizer } from "react-big-calendar";
+import moment from "moment";
+import "react-big-calendar/lib/css/react-big-calendar.css";
 import "../css/admin.scss";
 
 const Admin = () => {
+  const localizer = momentLocalizer(moment);
   const [standardPrice, setStandardPrice] = useState("");
   const [datePrices, setDatePrices] = useState([]);
-  const [newRange, setNewRange] = useState({ startDate: "", endDate: "" });
+  const [selectedDates, setSelectedDates] = useState([]);
   const [newPrice, setNewPrice] = useState("");
 
-  // Format date to UK style
-  const formatDate = (date) => {
-    if (!date) return "N/A";
-    return new Date(date).toLocaleDateString("en-GB", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    });
-  };
-
-  // Fetch prices from the server
   useEffect(() => {
     fetch("/api/prices")
       .then((res) => res.json())
       .then((data) => {
         setStandardPrice(data.standardPrice);
         setDatePrices(data.datePrices);
-        console.log("Fetched Data:", data);
       })
       .catch((err) => console.error("Error fetching prices:", err));
   }, []);
 
-  // Handle standard price update
+  const handleDateSelect = ({ start, end }) => {
+    console.log("Selection start:", start, "end:", end);
+    const startDate = moment(start).startOf("day");
+    const endDate = moment(end).startOf("day").subtract(1, "seconds"); // Include the end day
+
+    const selectedRange = [];
+    let currentDate = startDate.clone();
+
+    // Generate the range of dates, inclusive of both start and end
+    while (currentDate.isSameOrBefore(endDate)) {
+      selectedRange.push(currentDate.format("YYYY-MM-DD"));
+      currentDate.add(1, "day");
+    }
+
+    setSelectedDates((prevSelectedDates) => {
+      const updatedSelection = new Set(prevSelectedDates);
+
+      selectedRange.forEach((date) => {
+        if (updatedSelection.has(date)) {
+          updatedSelection.delete(date); // Remove if already selected
+        } else {
+          updatedSelection.add(date); // Add if not selected
+        }
+      });
+
+      return Array.from(updatedSelection); // Convert back to an array
+    });
+  };
+
+  const clearSelection = () => setSelectedDates([]);
+
   const updateStandardPrice = () => {
     fetch("/api/prices/standard", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ price: standardPrice }),
     })
-      .then((res) => res.json())
-      .then(() => {
-        alert("Standard price updated!");
-      })
+      .then(() => alert("Standard price updated!"))
       .catch((err) => console.error("Error updating standard price:", err));
   };
 
-  // Add or update a date-specific price
-  const addOrUpdateDatePrice = () => {
+  const updateSelectedDatesPrice = () => {
+    if (!selectedDates.length || !newPrice) {
+      alert("Select dates and enter a price.");
+      return;
+    }
+
     fetch("/api/prices/date-range", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        startDate: newRange.startDate,
-        endDate: newRange.endDate,
+        dates: selectedDates,
         price: newPrice,
       }),
     })
       .then((res) => res.json())
       .then((data) => {
-        setDatePrices(data.datePrices); // Update the UI with the new list
-        setNewRange({ startDate: "", endDate: "" });
+        setDatePrices(data.datePrices);
+        setSelectedDates([]);
         setNewPrice("");
-        // alert("Date range price updated!");
       })
-      .catch((err) => console.error("Error updating date price:", err));
+      .catch((err) => console.error("Error updating date prices:", err));
   };
 
-  // Delete a date-specific price
-  const deleteDateRangePrice = (id) => {
-    fetch(`/api/prices/date-range/${id}`, { method: "DELETE" })
-      .then((res) => res.json())
-      .then((data) => {
-        setDatePrices(data.datePrices); // Update the UI with the new list
-        // alert("Date-specific price removed!");
-      })
-      .catch((err) => console.error("Error deleting date price:", err));
+  const formatEvents = () => {
+    const events = [];
+    const dateMap = datePrices.reduce((acc, { date, price }) => {
+      acc[moment(date).format("YYYY-MM-DD")] = price;
+      return acc;
+    }, {});
+
+    const today = moment();
+    const daysInYear = 365;
+
+    for (let i = 0; i < daysInYear; i++) {
+      const currentDate = today.clone().add(i, "days");
+      const formattedDate = currentDate.format("YYYY-MM-DD");
+      const price = dateMap[formattedDate] || standardPrice;
+
+      events.push({
+        title: `£${price}`,
+        start: new Date(formattedDate),
+        end: new Date(formattedDate),
+        allDay: true,
+        selected: selectedDates.includes(formattedDate),
+      });
+    }
+
+    return events;
   };
 
-  console.log("Fetched Date Prices:", datePrices);
+  const eventStyleGetter = (event) => {
+    const backgroundColor = event.selected ? "lightblue" : "white";
+    const borderColor = event.selected ? "blue" : "gray";
+
+    return {
+      style: {
+        backgroundColor,
+        borderColor,
+        color: "black",
+        borderRadius: "5px",
+        textAlign: "center",
+        pointerEvents: "none", // Prevent interaction with the event overlay
+      },
+    };
+  };
+
+  const CustomToolbar = (toolbar) => {
+    return (
+      <div className="rbc-toolbar">
+        <button
+          type="button"
+          className="rbc-btn"
+          onClick={() => toolbar.onNavigate("PREV")}
+        >
+          Previous
+        </button>
+        <span className="rbc-toolbar-label">
+          {toolbar.label} {/* Displays the current month */}
+        </span>
+        <button
+          type="button"
+          className="rbc-btn"
+          onClick={() => toolbar.onNavigate("NEXT")}
+        >
+          Next
+        </button>
+      </div>
+    );
+  };
+
+  const dayPropGetter = (date) => {
+    const formattedDate = moment(date).format("YYYY-MM-DD");
+    const isSelected = selectedDates.includes(formattedDate);
+
+    return {
+      style: {
+        backgroundColor: isSelected ? "lightblue" : "inherit",
+        border: isSelected ? "1px solid blue" : "none",
+        cursor: "pointer",
+      },
+    };
+  };
+
   return (
     <div className="admin-container">
       <h1>Admin Page</h1>
@@ -91,54 +179,37 @@ const Admin = () => {
         <button onClick={updateStandardPrice}>Update Standard Price</button>
       </div>
 
-      <div className="date-prices-section">
-        <h2>Date-Specific Prices</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Price</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {datePrices.map((price) => (
-              <tr key={price.id}>
-                <td>{formatDate(price.date)}</td>
-                <td>£{Number(price.price).toFixed(2) || "N/A"}</td>
-                <td>
-                  <button onClick={() => deleteDateRangePrice(price.id)}>
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="calendar-section">
+        <h2>Manage Prices</h2>
+        <Calendar
+          localizer={localizer}
+          events={formatEvents()}
+          selectable
+          onSelectSlot={handleDateSelect}
+          onSelectEvent={(event) =>
+            handleDateSelect({ start: event.start, end: event.end })
+          }
+          dayPropGetter={dayPropGetter}
+          eventPropGetter={eventStyleGetter}
+          style={{ height: 500 }}
+          toolbar
+          components={{
+            toolbar: CustomToolbar,
+          }}
+          defaultView="month"
+          views={["month"]}
+          longPressThreshold={10} // Adjust to make it more sensitive to touch
+        />
 
-        <h3>Add/Update Date-Specific Price</h3>
-        <input
-          type="date"
-          value={newRange.startDate}
-          onChange={(e) =>
-            setNewRange((prev) => ({ ...prev, startDate: e.target.value }))
-          }
-        />
-        <input
-          type="date"
-          value={newRange.endDate}
-          onChange={(e) =>
-            setNewRange((prev) => ({ ...prev, endDate: e.target.value }))
-          }
-        />
         <input
           type="number"
           value={newPrice}
           onChange={(e) => setNewPrice(e.target.value)}
+          placeholder="Enter price for selected dates"
         />
-        <button onClick={addOrUpdateDatePrice}>Add/Update Price</button>
+        <button onClick={updateSelectedDatesPrice}>Update Price</button>
+        <button onClick={clearSelection}>Clear Selection</button>
       </div>
-      <Nav />
     </div>
   );
 };

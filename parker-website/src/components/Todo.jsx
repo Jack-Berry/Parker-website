@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import logo from "../assets/Bwythn_Preswylfa_Logo_Enhanced.png";
 import beach from "../assets/beach.jpg";
 import beach2 from "../assets/beach2.jpg";
 import beach3 from "../assets/beach3.jpg";
@@ -95,6 +96,7 @@ const Todo = () => {
 
   return (
     <div className="todo-container">
+      <img src={logo} className="logo" />
       <h1>What To Do?</h1>
       {sections.map((section, index) => (
         <AutoTransitionSection

@@ -16,7 +16,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 100px;
+  gap: 3rem;
   font-family: Arial, Helvetica, sans-serif;
 
   h1 {
@@ -26,11 +26,20 @@
     color: white;
     text-shadow: 2px 3px rgba(0, 0, 0, 0.341);
     text-align: center;
-    background-color: gray;
+    background-color: $col-a;
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 2;
+  }
+
+  .logo {
+    position: absolute;
+    width: 120px;
+    height: auto;
+    top: -10px;
+    left: 0;
+    z-index: 3;
   }
 }
 
@@ -39,27 +48,31 @@
   flex-direction: row;
   align-items: stretch;
   justify-content: space-between;
-  align-items: center;
-  margin: 20px 0;
-  height: 600px; /* Adjust height as needed */
-  gap: 50px;
-  padding: 20px;
-  margin-bottom: 50px;
+  height: 80vh;
+  gap: 2%;
+  padding: 1%;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
   position: relative;
 
   .todo-title-container {
     width: 60%;
-    height: 100%;
+    height: auto;
     position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    border-radius: 5px;
+    flex: 1;
+    aspect-ratio: 16 / 9;
 
     h2 {
       position: relative;
-      z-index: 2; /* Keep the text above the images */
+      bottom: -300px;
       width: 100%;
+      z-index: 2;
       font-size: 28px;
       font-weight: bold;
       color: white;
@@ -87,13 +100,13 @@
   }
 
   .todo-info-container {
-    // margin-top: 100px;
-    width: 40%;
-    height: 80%;
-    padding: 20px;
+    width: 35%;
+    min-height: 400px;
+    padding: 50px;
     background: white;
     opacity: 0.9;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
     z-index: 2;
     display: flex;
     flex-direction: column;
@@ -103,33 +116,39 @@
   }
 
   &.reverse {
-    flex-direction: row-reverse; /* Swap layout for alternating rows */
+    flex-direction: row-reverse;
   }
 }
 
 @media (max-width: 768px) {
+  .todo-container {
+    h1 {
+      font-size: 26px;
+    }
+    .logo {
+      width: 80px;
+      top: 5px;
+    }
+  }
   .todo-split-container {
-    flex-direction: column; /* Stack vertically on mobile */
-    height: auto; /* Let the height adjust based on content */
-    padding: 0;
+    flex-direction: column;
+    height: auto;
+    padding: 10px;
+    align-items: center;
     margin: 0;
 
     &.reverse {
-      flex-direction: column;
+      flex-direction: column; /* Override reverse logic for mobile */
     }
 
     .todo-title-container {
-      width: 100%; /* Full width for title container */
-      height: 300px; /* Fixed height */
-
-      h2 {
-        height: auto;
-      }
+      width: 100%;
+      height: auto;
+      margin-bottom: 1rem;
     }
 
     .todo-info-container {
-      width: 90%; /* Full width for info container */
-      height: auto; /* Let height adjust */
+      width: 90%;
     }
   }
 }

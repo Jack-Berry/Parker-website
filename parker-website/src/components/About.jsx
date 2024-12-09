@@ -1,10 +1,10 @@
-import React, { useState } from "react";
-import Nav from "./Nav";
+import React, { useState, useEffect } from "react";
 import "../css/about.scss";
 import ImageGallery from "react-image-gallery";
 import "react-image-gallery/styles/css/image-gallery.css";
 import Lightbox from "react-image-lightbox"; // For full-screen view
 import "react-image-lightbox/style.css";
+import logo from "../assets/Bwythn_Preswylfa_Logo_Enhanced.png";
 import image1 from "../assets/2.jpg";
 import image2 from "../assets/3.jpg";
 import image3 from "../assets/54.jpg";
@@ -14,6 +14,20 @@ import image6 from "../assets/IMG-20240520-WA0009.jpg";
 import image7 from "../assets/IMG-20240528-WA0000.jpg";
 import image8 from "../assets/SmartSelect_20240225_201528_Airbnb.jpg";
 import image9 from "../assets/SmartSelect_20240225_201536_Airbnb.jpg";
+import beach from "../assets/beach.jpg";
+import beach2 from "../assets/beach2.jpg";
+import beach3 from "../assets/beach3.jpg";
+import beach4 from "../assets/beach4.jpg";
+import beach5 from "../assets/beach5.jpg";
+import food from "../assets/food.jpg";
+import food2 from "../assets/food2.jpg";
+import food3 from "../assets/food3.jpg";
+import food4 from "../assets/food4.jpg";
+import tregele from "../assets/tregele.jpg";
+import tregele2 from "../assets/tregele2.jpg";
+import tregele3 from "../assets/tregele3.jpg";
+import tregele4 from "../assets/tregele4.jpg";
+import tregele5 from "../assets/tregele5.jpg";
 
 const About = () => {
   const [view, setView] = useState("carousel"); // Options: "carousel", "grid", "fullscreen"
@@ -30,7 +44,32 @@ const About = () => {
     { original: image7, thumbnail: image7 },
     { original: image8, thumbnail: image8 },
     { original: image9, thumbnail: image9 },
+    { original: tregele, thumbnail: tregele },
+    { original: tregele2, thumbnail: tregele2 },
+    { original: tregele3, thumbnail: tregele3 },
+    { original: tregele4, thumbnail: tregele4 },
+    { original: tregele5, thumbnail: tregele5 },
+    { original: food, thumbnail: food },
+    { original: food2, thumbnail: food2 },
+    { original: food3, thumbnail: food3 },
+    { original: food4, thumbnail: food4 },
+    { original: beach, thumbnail: beach },
+    { original: beach2, thumbnail: beach2 },
+    { original: beach3, thumbnail: beach3 },
+    { original: beach4, thumbnail: beach4 },
+    { original: beach5, thumbnail: beach5 },
   ];
+
+  useEffect(() => {
+    const preloadImages = (imageArray) => {
+      imageArray.forEach(({ original }) => {
+        const img = new Image();
+        img.src = original;
+      });
+    };
+
+    preloadImages(images);
+  }, [images]);
 
   // Render the current view
   const renderView = () => {
@@ -68,6 +107,7 @@ const About = () => {
 
   return (
     <div className="about-container">
+      <img src={logo} className="logo" />
       <h1>About</h1>
       <div className="about-content">
         <div className="feature-container">
@@ -214,7 +254,7 @@ const About = () => {
             title="Google Maps Location"
             src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d372.44411929445744!2d-4.473623768851724!3d53.40460114605375!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zNTPCsDI0JzE2LjciTiA0wrAyOCcyNC45Ilc!5e0!3m2!1sen!2suk!4v1733407752336!5m2!1sen!2suk"
             width="100%"
-            height="400"
+            height="500"
             style={{ border: 0 }}
             allowFullScreen=""
             loading="lazy"

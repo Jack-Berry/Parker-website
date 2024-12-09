@@ -24,12 +24,21 @@
     color: white;
     text-shadow: 2px 3px rgba(0, 0, 0, 0.341);
     text-align: center;
-    background-color: gray;
+    background-color: $col-a;
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 2;
-    margin-bottom: 100px;
+    // margin-bottom: 100px;
+  }
+
+  .logo {
+    position: absolute;
+    width: 120px;
+    height: auto;
+    top: -10px;
+    left: 0;
+    z-index: 3;
   }
 }
 
@@ -40,8 +49,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: rgba(36, 36, 36, 0.05);
+  // background-color: rgba(36, 36, 36, 0.05);
   border-radius: 5px;
+
   h3 {
     font-size: 16px;
     font-weight: 100;
@@ -55,9 +65,14 @@
   margin-bottom: 20px;
 
   .title-container {
-    font-size: 20px;
     font-weight: bold;
     text-align: center;
+
+    h2 {
+      color: $col-a;
+      font-size: 35px;
+      // font-family: ;
+    }
   }
 
   .info-container {
@@ -89,10 +104,18 @@
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 20px;
   justify-content: center;
-  max-width: 80%;
-  margin: 0 auto;
+  // max-width: 80%;
+  width: 125%;
+  // margin: 0 auto;
   padding: 20px;
   margin-bottom: 100px;
+}
+.gallery-grid {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
 }
 
 .gallery-grid img {
@@ -132,17 +155,20 @@
 }
 
 .about-content {
-  width: 100%;
+  padding-top: 50px;
+  width: 80%;
   height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
+  // background-color: rgba(36, 36, 36, 0.05);
+  // background-color: rgba(147, 29, 29, 0.912);
 }
 
 .map-container {
   margin-top: 40px;
   margin-bottom: 100px;
-  width: 80%;
+  width: 90%;
   display: flex;
   justify-content: center;
 
@@ -154,6 +180,15 @@
 
 /* Mobile-Specific Adjustments */
 @media (max-width: 768px) {
+  .about-container {
+    h1 {
+      font-size: 26px;
+    }
+    .logo {
+      width: 80px;
+      top: 5px;
+    }
+  }
   .image-gallery {
     padding: 0 10px; /* Add some padding for smaller screens */
 
