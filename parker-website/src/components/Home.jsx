@@ -298,7 +298,7 @@ const Home = () => {
       </div>
       <div className="home-content">
         <img src={logo} className="logo" />
-        <h1>Welcome to Bwythnpreswylfa</h1>
+        <h1>Welcome to Bwythn Preswylfa</h1>
         <DateRange
           ranges={dateRange}
           onChange={handleSelect}

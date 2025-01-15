@@ -79,6 +79,7 @@ const About = () => {
           items={images}
           showThumbnails={true}
           showPlayButton={false}
+          thumbnailPosition="bottom"
           onClick={(e) => {
             setLightboxIndex(e.currentIndex);
             setIsLightboxOpen(true);
@@ -113,22 +114,23 @@ const About = () => {
         <div className="feature-container">
           <div className="split-container">
             <div className="title-container">
-              <h2>Welcome</h2>
+              <h2 className="main-title">Welcome!</h2>
             </div>
             <div className="info-container">
               <h3>
-                Hello, we are Lucy, Jonny and Oscar and we are excited to share
-                our lovely home with you!
+                Hello! We’re Jonny, Lucy, Oscar, and Bertie — soon to be a
+                family of five this year. Welcome to Bwythn Preswylfa, our cosy
+                little holiday cottage.
               </h3>
               <h3>
-                We have put a lot of love into this place to make sure it is the
-                perfect holiday getaway, be it for a relaxing romantic getaway,
-                or for a fun filled family holiday complete with mucky paws.
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Reprehenderit vitae recusandae quaerat eum dignissimos. Sint,
-                similique. Ratione sequi fugit, aperiam, voluptas doloremque
-                expedita aut eligendi est suscipit commodi blanditiis eveniet!
-                lorem
+                Anglesey has held a special place in our hearts for many years;
+                it’s where we’ve made so many cherished family memories. Nestled
+                in a peaceful spot near the coastal path and the lovely village
+                of Cemaes, our cottage is the perfect retreat for relaxation and
+                adventure alike. With Mum just down the road in Amlwch, it feels
+                like home here, surrounded by friendly faces, stunning beaches,
+                and the natural beauty of the island. We can’t wait to share
+                this little slice of Anglesey with you.
               </h3>
             </div>
           </div>
