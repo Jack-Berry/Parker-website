@@ -28,6 +28,8 @@ import tregele2 from "../assets/tregele2.jpg";
 import tregele3 from "../assets/tregele3.jpg";
 import tregele4 from "../assets/tregele4.jpg";
 import tregele5 from "../assets/tregele5.jpg";
+import welcometo from "../assets/welcome.png";
+import topbar from "../assets/Topbar.png";
 
 const About = () => {
   const [view, setView] = useState("carousel"); // Options: "carousel", "grid", "fullscreen"
@@ -108,15 +110,16 @@ const About = () => {
 
   return (
     <div className="about-container">
-      <img src={logo} className="logo" />
-      <h1>About</h1>
+      {/* <img src={logo} className="logo" /> */}
+      {/* <h1>About</h1> */}
+      <img src={topbar} className="topbar" />
       <div className="about-content">
         <div className="feature-container">
           <div className="split-container">
             <div className="title-container">
-              <h2 className="main-title">Welcome!</h2>
+              <img src={welcometo} className="welcome-to" />
             </div>
-            <div className="info-container">
+            <div className="info-container main-title">
               <h3>
                 Hello! We’re Jonny, Lucy, Oscar, and Bertie — soon to be a
                 family of five this year. Welcome to Bwythn Preswylfa, our cosy
@@ -127,19 +130,26 @@ const About = () => {
                 it’s where we’ve made so many cherished family memories. Nestled
                 in a peaceful spot near the coastal path and the lovely village
                 of Cemaes, our cottage is the perfect retreat for relaxation and
-                adventure alike. With Mum just down the road in Amlwch, it feels
-                like home here, surrounded by friendly faces, stunning beaches,
-                and the natural beauty of the island. We can’t wait to share
-                this little slice of Anglesey with you.
+                adventure alike.
+              </h3>
+              <h3>
+                With Mum just down the road in Amlwch, it feels like home here,
+                surrounded by friendly faces, stunning beaches, and the natural
+                beauty of the island.
+              </h3>
+              <h3>
+                We can’t wait to share this little slice of Anglesey with you.
               </h3>
             </div>
           </div>
-          <div className="view-options">
-            <button onClick={() => setView("carousel")}>Carousel View</button>
-            <button onClick={() => setView("grid")}>Gallery View</button>
-          </div>
 
-          <div className="gallery-container">{renderView()}</div>
+          <div className="gallery-container">
+            {renderView()}{" "}
+            <div className="view-options">
+              <button onClick={() => setView("carousel")}>Carousel View</button>
+              <button onClick={() => setView("grid")}>Gallery View</button>
+            </div>
+          </div>
 
           {isLightboxOpen && (
             <Lightbox
@@ -161,10 +171,11 @@ const About = () => {
             />
           )}
         </div>
+
         <div className="feature-container">
-          <div className="split-container">
+          <div className="split-container" id="about-space">
             <div className="title-container">
-              <h2>About this space</h2>
+              <h2>About Our Cottage</h2>
             </div>
             <div className="info-container">
               <p>
@@ -180,9 +191,9 @@ const About = () => {
             </div>
           </div>
 
-          <div className="split-container">
+          <div className="split-container" id="about-space">
             <div className="title-container">
-              <h2>The Space</h2>
+              <h2>Living Spaces</h2>
             </div>
             <div className="info-container">
               <p>
@@ -221,9 +232,9 @@ const About = () => {
             </div>
           </div>
 
-          <div className="split-container">
+          <div className="split-container" id="about-space">
             <div className="title-container">
-              <h2>Essential Information</h2>
+              <h2>Good To Know</h2>
             </div>
             <div className="info-container">
               <ul>
@@ -242,12 +253,15 @@ const About = () => {
             </div>
           </div>
 
-          <div className="split-container">
+          <div className="split-container" id="about-space">
             <div className="title-container">
-              <h2>Guest Access</h2>
+              <h2>Accessibility</h2>
             </div>
             <div className="info-container">
-              <p>The whole property is available to the guests.</p>
+              <p>
+                While the entire property is available for use to guests, the
+                cottage is unfortunately unsuitable for wheelchair access.
+              </p>
             </div>
           </div>
         </div>

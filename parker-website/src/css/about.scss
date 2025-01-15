@@ -8,6 +8,13 @@
 ************END***********
 */
 
+@font-face {
+  font-family: "Sunborn"; /* Custom name for the font */
+  src: url("../assets/fonts/sunborn-sans-one.otf") format("opentype"); /* Path to the font file */
+  font-weight: normal; /* Adjust based on font's properties */
+  font-style: normal; /* Adjust based on font's properties */
+}
+
 .about-container {
   position: relative;
   height: 100%;
@@ -15,7 +22,20 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  font-family: Arial, Helvetica, sans-serif;
+  // font-family: Arial, Helvetica, sans-serif;
+  font-family: "Sunborn", sans-serif;
+  background-color: $background;
+
+  .topbar {
+    // width: 100%;
+    height: 125px;
+    // background-color: $col-a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2;
+    // object-fit: fill;
+  }
 
   h1 {
     width: 100%;
@@ -44,44 +64,70 @@
 
 .feature-container {
   //   border: 1px solid black;
-  width: 80%;
+  width: 100%;
   height: auto;
   display: flex;
   flex-direction: column;
   align-items: center;
   // background-color: rgba(36, 36, 36, 0.05);
   border-radius: 5px;
+  color: white;
+
+  #about-space {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    // text-align: center;
+    gap: 0;
+
+    h2 {
+      text-align: center;
+    }
+
+    .info-container {
+      padding-top: 0;
+      width: 100%;
+      text-align: center;
+    }
+  }
 
   h3 {
     font-size: 16px;
     font-weight: 100;
+    text-align: center;
   }
 }
 
 .split-container {
   width: 85%;
   display: flex;
-  flex-direction: column;
   margin-bottom: 20px;
 
   .title-container {
     font-weight: bold;
     text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
     h2 {
-      color: $col-a;
+      color: white;
       font-size: 38px;
-      // font-family: ;
     }
-    .main-title {
-      text-align: center;
-      margin-top: 150px;
-      margin-right: 100px;
-      font-size: 45px;
+    // .main-title {
+    //   text-align: center;
+    //   margin-top: 150px;
+    //   margin-right: 100px;
+    //   font-size: 45px;
+    // }
+    .welcome-to {
+      width: 450px;
+      height: auto;
     }
   }
 
   .info-container {
+    padding-top: 50px;
     width: 100%;
     font-size: 16px;
     text-align: center;
@@ -106,13 +152,20 @@
 }
 
 .gallery-container {
+  position: relative; /* Allows child elements to be positioned relative to this container */
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 20px;
   justify-content: center;
   width: 125%;
   padding: 20px;
+  margin-top: 100px;
   margin-bottom: 100px;
+  width: 80%;
+  border-top: solid 2px #ddd;
+  border-bottom: solid 2px #ddd;
+  padding-top: 50px;
+  padding-bottom: 80px;
 }
 .gallery-grid {
   display: flex;
@@ -129,6 +182,7 @@
   object-fit: cover;
   cursor: pointer;
   transition: transform 0.2s;
+  border: solid 2px #ddd;
 }
 
 .gallery-grid img:hover {
@@ -183,8 +237,8 @@
     }
 
     &:hover {
-      transform: scale(1.1);
-      border-color: #000;
+      // transform: scale(1.1);
+      border-color: white;
     }
   }
 
@@ -195,7 +249,7 @@
 
 .about-content {
   padding-top: 50px;
-  width: 80%;
+  width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -264,6 +318,13 @@
 @media (min-width: 650px) {
   .view-options {
     display: block;
+    position: absolute; /* Position it relative to the .gallery-container */
+    bottom: 10px; /* Adjust this value to set the distance from the bottom */
+    left: 50%; /* Center it horizontally */
+    transform: translateX(-50%); /* Correct centering offset */
+    display: flex; /* Keep the buttons inline */
+    justify-content: center;
+    gap: 10px; /* Add spacing between buttons if needed */
   }
 }
 
@@ -297,3 +358,5 @@
     }
   }
 }
+
+// TODO: Underline headers and ensure everything is centered + button makeover
