@@ -32,7 +32,7 @@ import welcometo from "../assets/welcome.png";
 import topbar from "../assets/Topbar.png";
 
 const About = () => {
-  const [view, setView] = useState("carousel"); // Options: "carousel", "grid", "fullscreen"
+  const [view, setView] = useState("grid"); // Options: "carousel", "grid", "fullscreen"
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 

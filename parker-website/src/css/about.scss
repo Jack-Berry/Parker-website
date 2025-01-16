@@ -82,6 +82,7 @@
 
     h2 {
       text-align: center;
+      text-decoration: underline;
     }
 
     .info-container {
@@ -352,8 +353,8 @@
       line-height: 1.6;
 
       ul {
-        list-style: disc;
-        margin-left: 20px;
+        list-style: none;
+        // margin-left: 20px;
       }
     }
   }

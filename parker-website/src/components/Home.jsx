@@ -71,11 +71,14 @@ const Home = () => {
 
   const fetchTotalPrice = async (startDate, endDate) => {
     try {
-      const response = await fetch("http://localhost:4000/api/prices/total", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ startDate, endDate }),
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/api/prices/total`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ startDate, endDate }),
+        }
+      );
 
       if (response.ok) {
         const data = await response.json();
@@ -183,7 +186,7 @@ const Home = () => {
     const adjustedEndDate = new Date(formData.endDate);
     adjustedEndDate.setDate(adjustedEndDate.getDate() + 1); // Adjust endDate for Google Calendar
 
-    const response = await fetch("http://localhost:4000/add-event", {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/add-event`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -209,8 +212,8 @@ const Home = () => {
 
       // Send confirmation email to yourself
       emailjs.send(
-        "service_q1e9fo2", // EmailJS Service ID
-        "template_2hc5skw", // EmailJS Template ID for Admin
+        process.env.REACT_APP_EMAILJS_SERVICE_ID, // EmailJS Service ID
+        process.env.REACT_APP_EMAILJS_TEMPLATE_ADMIN, // EmailJS Template ID for Admin
         {
           name: formData.name,
           numberOfPeople: formData.numberOfPeople,
@@ -221,13 +224,13 @@ const Home = () => {
           startDate: new Date(formData.startDate).toLocaleDateString(),
           endDate: new Date(formData.endDate).toLocaleDateString(),
         },
-        "J776se2Ztlf8I3zen" // EmailJS User ID
+        process.env.REACT_APP_EMAILJS_USER_ID // EmailJS User ID
       );
 
       // Send confirmation email to the customer
       emailjs.send(
-        "service_q1e9fo2",
-        "template_4bd2ucf", // EmailJS Template ID for Customer
+        process.env.REACT_APP_EMAILJS_SERVICE_ID,
+        process.env.REACT_APP_EMAILJS_TEMPLATE_CUSTOMER, // EmailJS Template ID for Customer
         {
           name: formData.name,
           numberOfPeople: formData.numberOfPeople,
@@ -238,7 +241,7 @@ const Home = () => {
           startDate: new Date(formData.startDate).toLocaleDateString(),
           endDate: new Date(formData.endDate).toLocaleDateString(),
         },
-        "J776se2Ztlf8I3zen"
+        process.env.REACT_APP_EMAILJS_USER_ID
       );
     } else {
       alert("Failed to add event. Please try again.");

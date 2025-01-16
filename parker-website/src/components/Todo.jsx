@@ -14,6 +14,7 @@ import tregele2 from "../assets/tregele2.jpg";
 import tregele3 from "../assets/tregele3.jpg";
 import tregele4 from "../assets/tregele4.jpg";
 import tregele5 from "../assets/tregele5.jpg";
+import topbar from "../assets/Topbar.png";
 import "../css/todo.scss";
 
 const Todo = () => {
@@ -96,8 +97,9 @@ const Todo = () => {
 
   return (
     <div className="todo-container">
-      <img src={logo} className="logo" />
-      <h1>What To Do?</h1>
+      {/* <img src={logo} className="logo" />
+      <h1>What To Do?</h1> */}
+      <img src={topbar} className="topbar" />
       {sections.map((section, index) => (
         <AutoTransitionSection
           key={index}

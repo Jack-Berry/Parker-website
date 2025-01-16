@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import logo from "../assets/Bwythn_Preswylfa_Logo_Enhanced.png";
+import topbar from "../assets/Topbar.png";
 import "../css/contact.scss";
 
 const Contact = () => {
@@ -22,7 +23,7 @@ const Contact = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch("https://formspree.io/f/xyzyndzo", {
+      const response = await fetch(process.env.REACT_APP_FORMSPREE_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -52,8 +53,9 @@ const Contact = () => {
 
   return (
     <div className="contact-container">
-      <img src={logo} className="logo" />
-      <h1>Contact</h1>
+      {/* <img src={logo} className="logo" />
+      <h1>Contact</h1> */}
+      <img src={topbar} className="topbar" />
       <div className="contact-content">
         <form className="contact-form" onSubmit={handleSubmit}>
           <div className="contact">
