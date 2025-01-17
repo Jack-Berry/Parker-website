@@ -60,10 +60,9 @@
   flex-direction: row;
   align-items: stretch;
   justify-content: space-between;
-  height: 80vh;
+  min-height: 80vh;
   gap: 2%;
   padding: 1%;
-  max-width: 1200px;
   width: 100%;
   margin: 0 auto;
   position: relative;
@@ -83,7 +82,7 @@
 
     h2 {
       position: relative;
-      bottom: -300px;
+      bottom: -350px;
       width: 100%;
       z-index: 2;
       font-size: 28px;
@@ -166,5 +165,11 @@
     .todo-info-container {
       width: 90%;
     }
+  }
+}
+
+@media (min-width: 900px) {
+  .todo-split-container {
+    width: 90%;
   }
 }

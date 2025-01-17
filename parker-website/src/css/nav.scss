@@ -11,86 +11,54 @@
 .nav-container {
   position: fixed;
   bottom: 0;
-  // transform: translateY(-50%);
-  right: 0;
-  height: 100px;
-  width: 100%;
+  width: 100%; /* Ensure it spans the full width of the screen */
+  height: 80px;
   display: flex;
-  flex-direction: row;
-  justify-content: space-around;
+  justify-content: space-evenly; /* Space the buttons evenly */
   align-items: center;
   z-index: 5;
-  background-color: $col-a;
-  // border-radius: 5px;
+  background-color: white;
 
   .tab {
-    border: 0;
-    color: white;
+    flex: 1; /* Allow each button to take up an equal portion of the available space */
+    text-align: center;
     font-weight: 500;
-    font-size: 18px;
-    // border-bottom: 2px solid gray;
+    font-size: 16px;
+    line-height: 80px; /* Vertically center the text */
+    color: $col-a;
+    border: none;
     background-color: transparent;
-    word-wrap: normal;
-    transition: border-width 0.2s linear;
-    line-height: 1.2;
-  }
-
-  .tab:hover {
-    border-bottom: 3px solid white;
     cursor: pointer;
+    transition: border-width 0.2s linear;
+
+    &:hover {
+      border-bottom: 3px solid $col-a;
+    }
   }
 }
-
-// @media (min-width: 650px) {
-//   .nav-container {
-//     position: absolute;
-//     top: 20px;
-//     // transform: translateY(-50%);
-//     right: 100px;
-//     height: 50px;
-//     width: 265px;
-//     display: flex;
-//     flex-direction: row;
-//     justify-content: space-between;
-//     // align-items: center;
-//     z-index: 3;
-//     background-color: $col-a;
-//     opacity: 0.9;
-//     // border-radius: 5px;
-//     border-top-left-radius: 15px;
-//     border-bottom-left-radius: 15px;
-
-//     .tab {
-//       font-size: 18px;
-//       line-break: auto;
-//       width: 80%;
-//     }
-//   }
-// }
 
 @media (min-width: 650px) {
   .nav-container {
     position: fixed;
     top: 50%;
+    right: -5px;
     transform: translateY(-50%);
-    // right: 5px;
     height: 250px;
     width: 65px;
-    display: flex;
     flex-direction: column;
     justify-content: space-around;
     align-items: center;
-    z-index: 3;
-    background-color: $col-a;
+    background-color: white;
     opacity: 0.9;
-    // border-radius: 5px;
+    z-index: 3;
     border-top-left-radius: 15px;
     border-bottom-left-radius: 15px;
+    border: solid 1px $col-a;
 
     .tab {
+      height: 20%;
       font-size: 14px;
-      line-break: auto;
-      width: 80%;
+      line-height: normal;
     }
   }
 }

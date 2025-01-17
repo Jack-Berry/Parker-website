@@ -36,30 +36,6 @@
     z-index: 2;
     // object-fit: fill;
   }
-
-  h1 {
-    width: 100%;
-    height: 100px;
-    margin: 0;
-    color: white;
-    text-shadow: 2px 3px rgba(0, 0, 0, 0.341);
-    text-align: center;
-    background-color: $col-a;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 2;
-    // margin-bottom: 100px;
-  }
-
-  .logo {
-    position: absolute;
-    width: 120px;
-    height: auto;
-    top: -10px;
-    left: 0;
-    z-index: 3;
-  }
 }
 
 .feature-container {
@@ -89,6 +65,11 @@
       padding-top: 0;
       width: 100%;
       text-align: center;
+
+      ul {
+        list-style: none;
+        // margin-left: 20px;
+      }
     }
   }
 
@@ -103,6 +84,7 @@
   width: 85%;
   display: flex;
   margin-bottom: 20px;
+  flex-direction: column;
 
   .title-container {
     font-weight: bold;
@@ -115,14 +97,9 @@
       color: white;
       font-size: 38px;
     }
-    // .main-title {
-    //   text-align: center;
-    //   margin-top: 150px;
-    //   margin-right: 100px;
-    //   font-size: 45px;
-    // }
     .welcome-to {
-      width: 450px;
+      width: 100%;
+      max-width: 450px;
       height: auto;
     }
   }
@@ -148,7 +125,6 @@
 
 .view-options button {
   margin: 0 10px;
-  padding: 10px 20px;
   cursor: pointer;
 }
 
@@ -326,6 +302,11 @@
     display: flex; /* Keep the buttons inline */
     justify-content: center;
     gap: 10px; /* Add spacing between buttons if needed */
+
+    button {
+      width: 120px;
+      height: 40px;
+    }
   }
 }
 
@@ -344,6 +325,11 @@
       font-size: 20px;
       font-weight: bold;
       text-align: right;
+
+      .welcome-to {
+        width: 450px;
+        height: auto;
+      }
     }
 
     .info-container {
@@ -351,11 +337,6 @@
       font-size: 16px;
       text-align: left;
       line-height: 1.6;
-
-      ul {
-        list-style: none;
-        // margin-left: 20px;
-      }
     }
   }
 }

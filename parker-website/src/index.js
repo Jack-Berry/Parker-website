@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import "./index.css";
@@ -10,6 +10,7 @@ import Contact from "./components/Contact";
 import Footer from "./components/Footer";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Nav from "./components/Nav";
+import Temp from "./components/Temp";
 
 const FooterWithCondition = () => {
   const location = useLocation();
@@ -17,18 +18,32 @@ const FooterWithCondition = () => {
   return hideFooterOnPaths.includes(location.pathname) ? null : <Footer />;
 };
 
+const App = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  if (!isAuthenticated) {
+    return <Temp onSuccess={() => setIsAuthenticated(true)} />;
+  }
+
+  return (
+    <>
+      <Routes>
+        <Route path="about" element={<About />} />
+        <Route path="what-to-do" element={<Todo />} />
+        <Route path="contact" element={<Contact />} />
+        <Route path="admin" element={<ProtectedRoute />} />
+        <Route path="*" element={<Home />} />
+      </Routes>
+      <Nav />
+      <FooterWithCondition />
+    </>
+  );
+};
+
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <BrowserRouter>
-    <Routes>
-      <Route path="about" element={<About />} />
-      <Route path="what-to-do" element={<Todo />} />
-      <Route path="contact" element={<Contact />} />
-      <Route path="admin" element={<ProtectedRoute />} />
-      <Route path="*" element={<Home />} />
-    </Routes>
-    <Nav />
-    <FooterWithCondition />
+    <App />
   </BrowserRouter>
 );
 

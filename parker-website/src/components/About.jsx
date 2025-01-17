@@ -4,7 +4,6 @@ import ImageGallery from "react-image-gallery";
 import "react-image-gallery/styles/css/image-gallery.css";
 import Lightbox from "react-image-lightbox"; // For full-screen view
 import "react-image-lightbox/style.css";
-import logo from "../assets/Bwythn_Preswylfa_Logo_Enhanced.png";
 import image1 from "../assets/2.jpg";
 import image2 from "../assets/3.jpg";
 import image3 from "../assets/54.jpg";
@@ -72,6 +71,26 @@ const About = () => {
 
     preloadImages(images);
   }, [images]);
+
+  // Dynamically set view based on screen size
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 850) {
+        setView("carousel"); // Force "carousel" view on mobile
+      } else {
+        setView("grid"); // Default to "grid" on desktop
+      }
+    };
+
+    // Initial check
+    handleResize();
+
+    // Add event listener for resizing
+    window.addEventListener("resize", handleResize);
+
+    // Cleanup event listener on component unmount
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   // Render the current view
   const renderView = () => {
