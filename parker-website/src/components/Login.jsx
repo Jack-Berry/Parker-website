@@ -8,7 +8,8 @@ const Login = ({ setToken }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/login`, {
+    console.log("HERE", `${process.env.REACT_APP_API_URL}/api/login`);
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password }),

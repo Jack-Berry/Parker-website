@@ -1,7 +1,7 @@
 import request from "superagent";
 
 export function getEvents(callback) {
-  const PROXY_URL = "http://localhost:4000/api/events";
+  const PROXY_URL = "https://holidayhomesandlets.co.uk/api/events";
 
   request.get(PROXY_URL).end((err, resp) => {
     if (!err) {

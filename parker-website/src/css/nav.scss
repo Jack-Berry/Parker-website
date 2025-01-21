@@ -24,15 +24,16 @@
     text-align: center;
     font-weight: 500;
     font-size: 16px;
-    line-height: 80px; /* Vertically center the text */
     color: $col-a;
     border: none;
     background-color: transparent;
     cursor: pointer;
-    transition: border-width 0.2s linear;
+    transition: all 0.2s linear;
+    font-family: "Sunborn", sans-serif;
 
     &:hover {
-      border-bottom: 3px solid $col-a;
+      // border-bottom: 3px solid $col-a;
+      scale: 1.2;
     }
   }
 }
@@ -57,7 +58,7 @@
 
     .tab {
       height: 20%;
-      font-size: 14px;
+      font-size: 12px;
       line-height: normal;
     }
   }

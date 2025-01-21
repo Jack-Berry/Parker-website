@@ -14,7 +14,7 @@ import Temp from "./components/Temp";
 
 const FooterWithCondition = () => {
   const location = useLocation();
-  const hideFooterOnPaths = ["/"]; // Add paths where the footer should be hidden
+  const hideFooterOnPaths = ["/", "/admin"]; // Add paths where the footer should be hidden
   return hideFooterOnPaths.includes(location.pathname) ? null : <Footer />;
 };
 
