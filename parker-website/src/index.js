@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import "./index.css";
@@ -18,6 +18,16 @@ const FooterWithCondition = () => {
   return hideFooterOnPaths.includes(location.pathname) ? null : <Footer />;
 };
 
+const ScrollToTop = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location]);
+
+  return null;
+};
+
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -27,6 +37,7 @@ const App = () => {
 
   return (
     <>
+      <ScrollToTop />
       <Routes>
         <Route path="about" element={<About />} />
         <Route path="what-to-do" element={<Todo />} />

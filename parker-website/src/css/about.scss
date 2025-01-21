@@ -303,6 +303,14 @@
       display: none;
     }
   }
+
+  .split-container {
+    .info-container {
+      &.main-title {
+        width: 85%;
+      }
+    }
+  }
 }
 
 @media (min-width: 650px) {
