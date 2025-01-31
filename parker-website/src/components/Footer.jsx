@@ -40,7 +40,7 @@ const Footer = () => {
       </div>
       <div className="footer-section contact">
         <p className="footer-title">CONTACT</p>
-        <p>info@holidayhomesandlets.co.uk</p>
+        <p>hello@holidayhomesandlets.co.uk</p>
         <p>Bwthyn Preswylfa</p>
         <p>Cromlech Ter</p>
         <p>Tregele</p>

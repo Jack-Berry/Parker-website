@@ -17,6 +17,7 @@ import image8 from "../assets/SmartSelect_20240225_201528_Airbnb.jpg";
 import image9 from "../assets/SmartSelect_20240225_201536_Airbnb.jpg";
 import Button from "./Button.jsx";
 import ContactForm from "./ContactForm.jsx";
+import { Spinner } from "react-bootstrap";
 import emailjs from "emailjs-com";
 
 const Home = () => {
@@ -284,8 +285,6 @@ const Home = () => {
     );
   };
 
-  if (loading) return <div>Loading...</div>;
-
   return (
     <div className="home-container">
       <div className="background-container">
@@ -300,39 +299,52 @@ const Home = () => {
         ))}
       </div>
       <div className="home-content">
-        <img src={logo} className="logo" />
+        <img src={logo} className="logo" alt="Logo" />
         <h1>Welcome to Bwythn Preswylfa</h1>
-        <DateRange
-          ranges={dateRange}
-          onChange={handleSelect}
-          disabledDay={isDisabledDate}
-          dayContentRenderer={customDayContentRenderer}
-        />
-        {toggle && (
-          <div className="contact-form-container">
-            <ContactForm formData={formData} handleChange={handleFormChange} />
-            <div className="total-price">
-              {totalPrice !== null && (
-                <p className="total-price">Total: £{totalPrice.toFixed(2)}</p>
-              )}
-            </div>
-            <div className="contact-button-container">
-              <Button
-                onClick={handleSubmit}
-                text="Submit Booking"
-                className="tab col-c"
-              />
-              <Button
-                onClick={() => setToggle(false)}
-                text="Cancel"
-                className="tab col-c"
-              />
-            </div>
+        {loading ? (
+          <div className="loading-placeholder">
+            <Spinner animation="border" variant="light" />
+            <p>Getting dates...</p>
           </div>
+        ) : (
+          <>
+            <DateRange
+              ranges={dateRange}
+              onChange={handleSelect}
+              disabledDay={isDisabledDate}
+              dayContentRenderer={customDayContentRenderer}
+            />
+            {toggle && (
+              <div className="contact-form-container">
+                <ContactForm
+                  formData={formData}
+                  handleChange={handleFormChange}
+                />
+                <div className="total-price">
+                  {totalPrice !== null && (
+                    <p className="total-price">
+                      Total: £{totalPrice.toFixed(2)}
+                    </p>
+                  )}
+                </div>
+                <div className="contact-button-container">
+                  <Button
+                    onClick={handleSubmit}
+                    text="Submit Booking"
+                    className="tab col-c"
+                  />
+                  <Button
+                    onClick={() => setToggle(false)}
+                    text="Cancel"
+                    className="tab col-c"
+                  />
+                </div>
+              </div>
+            )}
+            <Button onClick={handleBooking} text="Next" className="btn" />
+          </>
         )}
-        <Button onClick={handleBooking} text="Next" className="btn" />
       </div>
-      {/* <Nav /> */}
     </div>
   );
 };

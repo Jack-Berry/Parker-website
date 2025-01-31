@@ -10,6 +10,8 @@ import Contact from "./components/Contact";
 import Footer from "./components/Footer";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Nav from "./components/Nav";
+// import "bootstrap/dist/css/bootstrap.min.css";
+
 import Temp from "./components/Temp";
 
 const FooterWithCondition = () => {
@@ -29,11 +31,11 @@ const ScrollToTop = () => {
 };
 
 const App = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  // const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  if (!isAuthenticated) {
-    return <Temp onSuccess={() => setIsAuthenticated(true)} />;
-  }
+  // if (!isAuthenticated) {
+  //   return <Temp onSuccess={() => setIsAuthenticated(true)} />;
+  // }
 
   return (
     <>

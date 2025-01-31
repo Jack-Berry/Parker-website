@@ -101,10 +101,8 @@ const About = () => {
           showThumbnails={true}
           showPlayButton={false}
           thumbnailPosition="bottom"
-          onClick={(e) => {
-            setLightboxIndex(e.currentIndex);
-            setIsLightboxOpen(true);
-          }}
+          onSlide={(index) => setLightboxIndex(index)} // Track active index
+          onClick={() => setIsLightboxOpen(true)} // Open Lightbox when image is clicked
         />
       );
     } else if (view === "grid") {
@@ -170,7 +168,7 @@ const About = () => {
             </div>
           </div>
 
-          {isLightboxOpen && (
+          {isLightboxOpen && images[lightboxIndex] && (
             <Lightbox
               mainSrc={images[lightboxIndex].original}
               nextSrc={images[(lightboxIndex + 1) % images.length].original}
