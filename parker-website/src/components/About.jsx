@@ -139,7 +139,7 @@ const About = () => {
             <div className="info-container main-title">
               <h3>
                 Hello! We’re Jonny, Lucy, Oscar, and Bertie — soon to be a
-                family of five this year. Welcome to Bwythn Preswylfa, our cosy
+                family of five this year. Welcome to Bwthyn Preswylfa, our cosy
                 little holiday cottage.
               </h3>
               <h3>

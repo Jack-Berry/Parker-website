@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import logo from "../assets/Bwythn_Preswylfa_Logo_Enhanced.png";
 import topbar from "../assets/Topbar.png";
 import "../css/contact.scss";
 
@@ -20,16 +19,20 @@ const Contact = () => {
   };
 
   const handleSubmit = async (e) => {
+    console.log("Form submit clicked");
     e.preventDefault();
 
     try {
-      const response = await fetch(process.env.REACT_APP_FORMSPREE_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/api/contact`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        }
+      );
 
       if (response.ok) {
         setFormData({
@@ -53,8 +56,6 @@ const Contact = () => {
 
   return (
     <div className="contact-container">
-      {/* <img src={logo} className="logo" />
-      <h1>Contact</h1> */}
       <img src={topbar} className="topbar" />
       <div className="contact-content">
         <form className="contact-form" onSubmit={handleSubmit}>

@@ -38,7 +38,7 @@
   align-items: stretch;
   justify-content: space-between;
   min-height: 80vh;
-  gap: 2%;
+  gap: 5px;
   padding: 1%;
   width: 100%;
   margin: 0 auto;
@@ -93,12 +93,10 @@
     width: 35%;
     min-height: 400px;
     padding: 50px;
-    // background: white;
     background: $col-a;
     color: white;
     opacity: 0.9;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    // border: white 2px solid;
     border-radius: 5px;
     z-index: 2;
     display: flex;
@@ -137,7 +135,11 @@
     .todo-title-container {
       width: 100%;
       height: auto;
-      margin-bottom: 1rem;
+      min-height: 250px;
+      h2 {
+        bottom: -90px;
+        font-size: 22px;
+      }
     }
 
     .todo-info-container {

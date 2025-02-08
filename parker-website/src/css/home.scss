@@ -130,6 +130,7 @@ h1 {
   width: 90%;
   max-width: 800px;
   max-height: 80vh; // Ensure it fits smaller screens
+  min-height: 700px;
   overflow-y: auto; // Enables scrolling if content exceeds max height
   background-color: $col-a;
   border-radius: 5%;
@@ -207,12 +208,13 @@ h1 {
 }
 .contact-button-container {
   width: 100%;
-  margin-bottom: 20px;
+  // margin-bottom: 20px;
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  gap: 20px;
+  gap: 50px;
+  // transform: translateY(-130px);
 
   .btn {
     width: 45%;
@@ -224,6 +226,13 @@ h1 {
     font-size: 20px;
     height: 60px;
   }
+}
+
+.success-message {
+  font-size: 24px;
+  text-align: center;
+  font-weight: bold;
+  width: 60%;
 }
 
 @media (min-width: 650px) {
@@ -254,10 +263,11 @@ h1 {
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    gap: 50px;
+    gap: 232px;
+    transform: translateY(-130px);
 
     .btn {
-      width: 45%;
+      width: 25%;
     }
   }
 }

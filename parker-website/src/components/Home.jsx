@@ -42,6 +42,8 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [toggle, setToggle] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [formSubmitted, setFormSubmitted] = useState(false); // New state for tracking form submission
+
   const images = [
     image1,
     image2,
@@ -184,22 +186,49 @@ const Home = () => {
   };
 
   const handleSubmit = async () => {
-    const adjustedEndDate = new Date(formData.endDate);
-    adjustedEndDate.setDate(adjustedEndDate.getDate() + 1); // Adjust endDate for Google Calendar
+    try {
+      const adjustedEndDate = new Date(formData.endDate);
+      adjustedEndDate.setDate(adjustedEndDate.getDate() + 1);
 
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/add-event`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
+      const bookingData = {
         startDate: formData.startDate,
         endDate: adjustedEndDate.toISOString(),
         summary: `Booking for ${formData.name}`,
         description: `Name: ${formData.name}, Email: ${formData.email}, Phone: ${formData.telephone}, Guests: ${formData.numberOfPeople}, Pets: ${formData.numberOfPets}, Message: ${formData.message}`,
-      }),
-    });
+        totalPrice,
+        name: formData.name,
+        email: formData.email,
+        numberOfPeople: formData.numberOfPeople,
+        numberOfPets: formData.numberOfPets,
+        telephone: formData.telephone,
+        message: formData.message,
+      };
 
-    if (response.ok) {
-      alert(`Booking Successful!`);
+      const calendarResponse = await fetch(
+        `${process.env.REACT_APP_API_URL}/api/add-event`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(bookingData),
+        }
+      );
+
+      if (!calendarResponse.ok) {
+        throw new Error("Failed to add event to Google Calendar.");
+      }
+
+      const emailResponse = await fetch(
+        `${process.env.REACT_APP_API_URL}/api/send-booking-emails`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(bookingData),
+        }
+      );
+
+      if (!emailResponse.ok) {
+        throw new Error("Failed to send confirmation emails.");
+      }
 
       setBookings((prevBookings) => [
         ...prevBookings,
@@ -209,43 +238,14 @@ const Home = () => {
         },
       ]);
 
-      setToggle(!toggle);
-
-      // Send confirmation email to yourself
-      emailjs.send(
-        process.env.REACT_APP_EMAILJS_SERVICE_ID, // EmailJS Service ID
-        process.env.REACT_APP_EMAILJS_TEMPLATE_ADMIN, // EmailJS Template ID for Admin
-        {
-          name: formData.name,
-          numberOfPeople: formData.numberOfPeople,
-          numberOfPets: formData.numberOfPets, // Include pets
-          telephone: formData.telephone,
-          email: formData.email,
-          message: formData.message, // Include message
-          startDate: new Date(formData.startDate).toLocaleDateString(),
-          endDate: new Date(formData.endDate).toLocaleDateString(),
-        },
-        process.env.REACT_APP_EMAILJS_USER_ID // EmailJS User ID
-      );
-
-      // Send confirmation email to the customer
-      emailjs.send(
-        process.env.REACT_APP_EMAILJS_SERVICE_ID,
-        process.env.REACT_APP_EMAILJS_TEMPLATE_CUSTOMER, // EmailJS Template ID for Customer
-        {
-          name: formData.name,
-          numberOfPeople: formData.numberOfPeople,
-          numberOfPets: formData.numberOfPets,
-          telephone: formData.telephone,
-          email: formData.email,
-          message: formData.message,
-          startDate: new Date(formData.startDate).toLocaleDateString(),
-          endDate: new Date(formData.endDate).toLocaleDateString(),
-        },
-        process.env.REACT_APP_EMAILJS_USER_ID
-      );
-    } else {
-      alert("Failed to add event. Please try again.");
+      setFormSubmitted(true); // Show thank-you message
+      setTimeout(() => {
+        setFormSubmitted(false);
+        setToggle(false);
+      }, 2000); // Hide form and thank-you message after 5 seconds
+    } catch (error) {
+      console.error("Error submitting booking:", error);
+      alert("An error occurred. Please try again.");
     }
   };
 
@@ -300,7 +300,7 @@ const Home = () => {
       </div>
       <div className="home-content">
         <img src={logo} className="logo" alt="Logo" />
-        <h1>Welcome to Bwythn Preswylfa</h1>
+        <h1>Welcome to Bwthyn Preswylfa</h1>
         {loading ? (
           <div className="loading-placeholder">
             <Spinner animation="border" variant="light" />
@@ -316,32 +316,47 @@ const Home = () => {
             />
             {toggle && (
               <div className="contact-form-container">
-                <ContactForm
-                  formData={formData}
-                  handleChange={handleFormChange}
-                />
-                <div className="total-price">
-                  {totalPrice !== null && (
-                    <p className="total-price">
-                      Total: £{totalPrice.toFixed(2)}
+                {formSubmitted ? (
+                  <>
+                    <p className="success-message">
+                      Thank you! Your booking request has been submitted.
                     </p>
-                  )}
-                </div>
-                <div className="contact-button-container">
-                  <Button
-                    onClick={handleSubmit}
-                    text="Submit Booking"
-                    className="tab col-c"
-                  />
-                  <Button
-                    onClick={() => setToggle(false)}
-                    text="Cancel"
-                    className="tab col-c"
-                  />
-                </div>
+                    <p className="success-message">
+                      You will receive an email confirmation shortly.
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <ContactForm
+                      formData={formData}
+                      handleChange={handleFormChange}
+                    />
+                    <div className="total-price">
+                      {totalPrice !== null && (
+                        <p>Total: £{totalPrice.toFixed(2)}</p>
+                      )}
+                    </div>
+                    <div className="contact-button-container">
+                      <Button
+                        onClick={handleSubmit}
+                        text="Submit Booking"
+                        className="tab col-c"
+                      />
+                      <Button
+                        onClick={() => setToggle(false)}
+                        text="Cancel"
+                        className="tab col-c"
+                      />
+                    </div>
+                  </>
+                )}
               </div>
             )}
-            <Button onClick={handleBooking} text="Next" className="btn" />
+            <Button
+              onClick={() => setToggle(!toggle)}
+              text="Next"
+              className="btn"
+            />
           </>
         )}
       </div>
