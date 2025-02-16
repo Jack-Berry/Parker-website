@@ -3,7 +3,7 @@ import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 import "../css/home.scss";
 import { DateRange } from "react-date-range";
-import { eachDayOfInterval, parseISO } from "date-fns";
+import { eachDayOfInterval, parseISO, differenceInDays } from "date-fns";
 import { getEvents } from "../utils/fetch.js";
 import logo from "../assets/Bwythn_Preswylfa_Logo_Enhanced.png";
 import image1 from "../assets/2.jpg";
@@ -42,7 +42,9 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [toggle, setToggle] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [formSubmitted, setFormSubmitted] = useState(false); // New state for tracking form submission
+  const [formSubmitted, setFormSubmitted] = useState(false);
+  const [showCleaningChargeMessage, setShowCleaningChargeMessage] =
+    useState(false);
 
   const images = [
     image1,
@@ -85,7 +87,18 @@ const Home = () => {
 
       if (response.ok) {
         const data = await response.json();
-        setTotalPrice(data.total); // Update total price state
+        let finalTotal = data.total;
+
+        // Apply £60 cleaning charge if stay is 3 nights or less
+        const numNights = differenceInDays(
+          new Date(endDate),
+          new Date(startDate)
+        );
+        if (numNights <= 3) {
+          finalTotal += 60;
+        }
+
+        setTotalPrice(finalTotal);
       } else {
         console.error("Failed to fetch total price");
       }
@@ -124,6 +137,7 @@ const Home = () => {
 
   const handleSelect = (ranges) => {
     const newRange = ranges.selection;
+    const numNights = differenceInDays(newRange.endDate, newRange.startDate);
 
     if (
       eachDayOfInterval({
@@ -153,6 +167,8 @@ const Home = () => {
         startDate: newRange.startDate.toISOString(),
         endDate: newRange.endDate.toISOString(),
       }));
+
+      setShowCleaningChargeMessage(numNights <= 3);
 
       // Fetch total price with new range
       fetchTotalPrice(
@@ -238,11 +254,11 @@ const Home = () => {
         },
       ]);
 
-      setFormSubmitted(true); // Show thank-you message
+      setFormSubmitted(true);
       setTimeout(() => {
         setFormSubmitted(false);
         setToggle(false);
-      }, 2000); // Hide form and thank-you message after 5 seconds
+      }, 2000);
     } catch (error) {
       console.error("Error submitting booking:", error);
       alert("An error occurred. Please try again.");
@@ -277,7 +293,6 @@ const Home = () => {
             ? "green"
             : "inherit",
           color: isDisabled ? "white" : isSelected ? "white" : "inherit",
-          // borderRadius: isStartDate || isEndDate ? borderRadius : "0",
         }}
       >
         {day.getDate()}
@@ -314,6 +329,7 @@ const Home = () => {
               disabledDay={isDisabledDate}
               dayContentRenderer={customDayContentRenderer}
             />
+
             {toggle && (
               <div className="contact-form-container">
                 {formSubmitted ? (
@@ -357,6 +373,12 @@ const Home = () => {
               text="Next"
               className="btn"
             />
+            {showCleaningChargeMessage && (
+              <p className="cleaning-charge-message">
+                If booking 3 nights or less, there will be a £60 cleaning and
+                changeover charge added.
+              </p>
+            )}
           </>
         )}
       </div>

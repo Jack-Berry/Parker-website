@@ -15,7 +15,8 @@
 
 .home-container {
   position: absolute;
-  height: 100%;
+  min-height: 900px;
+  height: auto;
   width: 100%;
 }
 .background-container {
@@ -74,6 +75,12 @@
     width: 120px;
     height: auto;
     z-index: 3;
+  }
+  .cleaning-charge-message {
+    font-weight: bold;
+    color: white;
+    text-align: center;
+    width: 80%;
   }
 }
 
@@ -243,7 +250,7 @@ h1 {
     top: 15%;
     left: 10%;
     width: 80%;
-    height: 70%;
+    height: auto;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -254,6 +261,10 @@ h1 {
 
   .contact-form-container {
     width: 80%;
+    max-height: none;
+    top: 0;
+    height: 100%;
+    border-radius: 0;
   }
 
   .contact-button-container {
