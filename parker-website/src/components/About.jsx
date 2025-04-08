@@ -29,6 +29,35 @@ import tregele4 from "../assets/tregele4.jpg";
 import tregele5 from "../assets/tregele5.jpg";
 import welcometo from "../assets/welcome.png";
 import topbar from "../assets/Topbar.png";
+import New1 from "../assets/New-1.jpg";
+import New2 from "../assets/New-2.jpg";
+import New3 from "../assets/New-3.jpg";
+import New4 from "../assets/New-4.jpg";
+import New5 from "../assets/New-5.jpg";
+import New6 from "../assets/New-6.jpg";
+import New7 from "../assets/New-7.jpg";
+import New8 from "../assets/New-8.jpg";
+import New9 from "../assets/New-9.jpg";
+import New10 from "../assets/New-10.jpg";
+import New11 from "../assets/New-11.jpg";
+import New12 from "../assets/New-12.jpg";
+import New13 from "../assets/New-13.jpg";
+import New14 from "../assets/New-14.jpg";
+import New15 from "../assets/New-15.jpg";
+import New16 from "../assets/New-16.jpg";
+import New17 from "../assets/New-17.jpg";
+import New18 from "../assets/New-18.jpg";
+import New19 from "../assets/New-19.jpg";
+import New20 from "../assets/New-20.jpg";
+import New21 from "../assets/New-21.jpg";
+import New22 from "../assets/New-22.jpg";
+import New23 from "../assets/New-23.jpg";
+import New24 from "../assets/New-24.jpg";
+import New25 from "../assets/New-25.jpg";
+import New26 from "../assets/New-26.jpg";
+import New27 from "../assets/New-27.jpg";
+import New28 from "../assets/New-28.jpg";
+import New29 from "../assets/New-29.jpg";
 
 const About = () => {
   const [view, setView] = useState("grid"); // Options: "carousel", "grid", "fullscreen"
@@ -59,6 +88,35 @@ const About = () => {
     { original: beach3, thumbnail: beach3 },
     { original: beach4, thumbnail: beach4 },
     { original: beach5, thumbnail: beach5 },
+    { original: New1, thumbnail: New1 },
+    { original: New2, thumbnail: New2 },
+    { original: New3, thumbnail: New3 },
+    { original: New4, thumbnail: New4 },
+    { original: New5, thumbnail: New5 },
+    { original: New6, thumbnail: New6 },
+    { original: New7, thumbnail: New7 },
+    { original: New8, thumbnail: New8 },
+    { original: New9, thumbnail: New9 },
+    { original: New10, thumbnail: New10 },
+    { original: New11, thumbnail: New11 },
+    { original: New12, thumbnail: New12 },
+    { original: New13, thumbnail: New13 },
+    { original: New14, thumbnail: New14 },
+    { original: New15, thumbnail: New15 },
+    { original: New16, thumbnail: New16 },
+    { original: New17, thumbnail: New17 },
+    { original: New18, thumbnail: New18 },
+    { original: New19, thumbnail: New19 },
+    { original: New20, thumbnail: New20 },
+    { original: New21, thumbnail: New21 },
+    { original: New22, thumbnail: New22 },
+    { original: New23, thumbnail: New23 },
+    { original: New24, thumbnail: New24 },
+    { original: New25, thumbnail: New25 },
+    { original: New26, thumbnail: New26 },
+    { original: New27, thumbnail: New27 },
+    { original: New28, thumbnail: New28 },
+    { original: New29, thumbnail: New29 },
   ];
 
   useEffect(() => {
