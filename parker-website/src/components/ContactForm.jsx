@@ -1,9 +1,24 @@
 import React from "react";
 
 const ContactForm = ({ formData, handleChange }) => {
+  const hasDates = Boolean(formData.startDate && formData.endDate);
+  let dateText = "";
+  if (hasDates) {
+    try {
+      const start = new Date(formData.startDate);
+      const end = new Date(formData.endDate);
+      if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
+        dateText = `You are booking from ${start.toLocaleDateString()} - ${end.toLocaleDateString()}.`;
+      }
+    } catch {
+      // silently ignore; dateText stays empty
+    }
+  }
+
   return (
     <form className="contact-form">
       <h1>We need to take some details...</h1>
+
       <div className="contact-field">
         <label htmlFor="name">Name:</label>
         <input
@@ -14,6 +29,7 @@ const ContactForm = ({ formData, handleChange }) => {
           onChange={handleChange}
           required
           className="contact-input"
+          autoComplete="name"
         />
       </div>
 
@@ -27,6 +43,7 @@ const ContactForm = ({ formData, handleChange }) => {
           onChange={handleChange}
           required
           className="contact-input"
+          min="1"
         />
       </div>
 
@@ -39,6 +56,7 @@ const ContactForm = ({ formData, handleChange }) => {
           value={formData.numberOfPets}
           onChange={handleChange}
           className="contact-input"
+          min="0"
         />
       </div>
 
@@ -52,6 +70,7 @@ const ContactForm = ({ formData, handleChange }) => {
           onChange={handleChange}
           required
           className="contact-input"
+          autoComplete="tel"
         />
       </div>
 
@@ -65,6 +84,7 @@ const ContactForm = ({ formData, handleChange }) => {
           onChange={handleChange}
           required
           className="contact-input"
+          autoComplete="email"
         />
       </div>
 
@@ -76,17 +96,16 @@ const ContactForm = ({ formData, handleChange }) => {
           value={formData.message}
           onChange={handleChange}
           className="contact-textarea"
+          rows={4}
           placeholder="Add any additional details or requests here..."
         />
       </div>
 
-      <div className="contact-field">
-        <h2>{`You are booking from ${new Date(
-          formData.startDate
-        ).toLocaleDateString()} - ${new Date(
-          formData.endDate
-        ).toLocaleDateString()}.`}</h2>
-      </div>
+      {dateText && (
+        <div className="contact-field">
+          <h2>{dateText}</h2>
+        </div>
+      )}
     </form>
   );
 };

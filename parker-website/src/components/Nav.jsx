@@ -1,29 +1,59 @@
-import React, { Component } from "react";
+import React from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import Button from "./Button";
-import { useNavigate } from "react-router-dom";
 import "../css/nav.scss";
+import { getPropertyBySlug } from "../config/properties";
 
 const Nav = () => {
+  const location = useLocation();
   const navigate = useNavigate();
 
-  const handleHome = () => {
-    navigate("/");
-  };
-  const handleAbout = () => {
-    navigate("/about");
-  };
-  const handleContact = () => {
-    navigate("/contact");
-  };
-  const handleToDo = () => {
-    navigate("/what-to-do");
-  };
+  // Derive slug from pathname, e.g. /property/preswylfa/...
+  const match = location.pathname.match(/^\/property\/([^/]+)/);
+  const propertySlug = match ? match[1] : null;
+  const property = propertySlug ? getPropertyBySlug(propertySlug) : null;
+
+  const goto = (path) => navigate(path);
+
   return (
     <div className="nav-container">
-      <Button onClick={handleHome} text={"Home"} className={"tab"} />
-      <Button onClick={handleAbout} text={"About"} className={"tab"} />
-      <Button onClick={handleToDo} text={"What to do"} className={"tab"} />
-      <Button onClick={handleContact} text={"Contact"} className={"tab"} />
+      {propertySlug ? (
+        <>
+          <Button
+            onClick={() => goto(`/property/${propertySlug}`)}
+            text="Book"
+            className="tab"
+          />
+          <Button
+            onClick={() => goto(`/property/${propertySlug}/about`)}
+            text="About"
+            className="tab"
+          />
+          <Button
+            onClick={() => goto(`/property/${propertySlug}/what-to-do`)}
+            text="What to do"
+            className="tab"
+          />
+          <Button
+            onClick={() => goto(`/property/${propertySlug}/contact`)}
+            text="Contact"
+            className="tab"
+          />
+
+          {/* “Properties” button linking back to the selection page */}
+          <Button
+            onClick={() => goto("/")}
+            text="Select Property"
+            className="tab properties-tab"
+          />
+        </>
+      ) : (
+        <Button
+          onClick={() => goto("/")}
+          text="Choose Property"
+          className="tab"
+        />
+      )}
     </div>
   );
 };

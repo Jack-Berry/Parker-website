@@ -1,66 +1,107 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import logo from "../assets/Bwythn_Preswylfa_Logo_Enhanced.png";
+import { useLocation, useNavigate } from "react-router-dom";
 import "../css/footer.scss";
 import { FaFacebook, FaInstagram } from "react-icons/fa";
+import { getPropertyBySlug } from "../config/properties";
 
 const Footer = () => {
+  const location = useLocation();
   const navigate = useNavigate();
 
-  const handleOwnerLogin = () => {
-    navigate("/admin");
-  };
+  // Derive slug from the current URL (Footer is outside <Routes/>)
+  const match = location.pathname.match(/^\/property\/([^/]+)/);
+  const propertySlug = match ? match[1] : null;
+  const property = propertySlug ? getPropertyBySlug(propertySlug) : null;
+
+  // Build scoped links
+  const homeHref = propertySlug ? `/property/${propertySlug}` : "/";
+  const aboutHref = propertySlug ? `/property/${propertySlug}/about` : "/about";
+  const todoHref = propertySlug
+    ? `/property/${propertySlug}/what-to-do`
+    : "/what-to-do";
+  const contactHref = propertySlug
+    ? `/property/${propertySlug}/contact`
+    : "/contact";
+  const adminHref = "/admin";
+
+  const handleOwnerLogin = () => navigate(adminHref);
+
+  const email = property?.contact?.email || "hello@holidayhomesandlets.co.uk";
+  const addressLines = property?.contact?.addressLines || [
+    property?.name || "Our Property",
+    property?.location?.address || "",
+  ];
+  const facebook = property?.contact?.social?.facebook || null;
+  const instagram = property?.contact?.social?.instagram || null;
 
   return (
     <footer>
       <div className="footer-section logo">
-        <img src={logo} alt="Bwthyn Preswylfa Logo" />
+        {property?.images?.logo ? (
+          <img
+            src={property.images.logo}
+            alt={`${property.name || "Property"} Logo`}
+          />
+        ) : (
+          <div aria-label="Logo" style={{ height: 48 }} />
+        )}
       </div>
+
       <div className="footer-section links">
         <ul>
           <li>
-            <a href="/">Book</a>
+            <a href={homeHref}>Book</a>
           </li>
           <li>
-            <a href="/about">About</a>
+            <a href={aboutHref}>About</a>
           </li>
           <li>
-            <a href="/what-to-do">Things To Do</a>
+            <a href={todoHref}>Things To Do</a>
           </li>
           <li>
-            <a href="/contact">Contact Us</a>
+            <a href={contactHref}>Contact Us</a>
           </li>
           <li>
-            <a href="/admin">Owner Login</a>
+            <a href="/admin" className="linklike">
+              Owner Login
+            </a>
           </li>
         </ul>
-        {/* <button onClick={handleOwnerLogin} className="btn">
-          Owner Login
-        </button> */}
       </div>
+
       <div className="footer-section contact">
         <p className="footer-title">CONTACT</p>
-        <p>hello@holidayhomesandlets.co.uk</p>
-        <p>Bwthyn Preswylfa</p>
-        <p>Cromlech Ter</p>
-        <p>Tregele</p>
-        <p>Cemaes</p>
-        <p>LL67 0DW</p>
+
+        <p>
+          <a href={`mailto:${email}`}>{email}</a>
+        </p>
+
+        {/* Address, line by line */}
+        {addressLines.filter(Boolean).map((line, idx) => (
+          <p key={`addr-${idx}`}>{line}</p>
+        ))}
+
         <div className="social-links">
-          <a
-            href="https://www.facebook.com/p/bwythn-preswylfa-61557385151261/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <FaFacebook />
-          </a>
-          <a
-            href="https://www.instagram.com/bwythnpreswylfa1"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <FaInstagram />
-          </a>
+          {facebook && (
+            <a
+              href={facebook}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Facebook"
+            >
+              <FaFacebook />
+            </a>
+          )}
+          {instagram && (
+            <a
+              href={instagram}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram"
+            >
+              <FaInstagram />
+            </a>
+          )}
         </div>
       </div>
     </footer>

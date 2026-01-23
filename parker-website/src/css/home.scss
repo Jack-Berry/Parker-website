@@ -14,32 +14,31 @@
 */
 
 .home-container {
-  position: absolute;
-  min-height: 900px;
+  position: relative;
+  min-height: 100vh;
   height: auto;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 200px;
 }
 .background-container {
-  position: absolute;
-  top: 0;
-  left: 0;
+  position: fixed;
+  inset: 0;
+  z-index: 0;
   width: 100%;
   height: 100%;
-  z-index: -1;
   overflow: hidden;
+  pointer-events: none;
 }
 
 .background-image {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   background-size: cover;
   background-position: center;
-  background-repeat: no-repeat;
   opacity: 0;
-  transition: opacity 3s ease-in-out;
+  transition: opacity 800ms ease;
 }
 
 .background-image.visible {
@@ -81,6 +80,45 @@
     color: white;
     text-align: center;
     width: 80%;
+  }
+}
+
+.price-summary {
+  background: white;
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  margin: -8px auto 1.5rem;
+  max-width: 300px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-top: 1px solid #e5e7eb;
+
+  .price-summary-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0;
+
+    .price-label {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: #4b5563;
+    }
+
+    .price-amount {
+      font-size: 1.65rem;
+      font-weight: 700;
+      color: #059669;
+    }
+  }
+
+  .price-note {
+    margin: 0.65rem 0 0 0;
+    padding-top: 0.65rem;
+    border-top: 1px solid #e5e7eb;
+    font-size: 0.8rem;
+    color: #6b7280;
+    text-align: left;
+    line-height: 1.3;
   }
 }
 
@@ -292,6 +330,31 @@ h1 {
 
 @media (max-width: 768px) {
   .home-container {
-    padding-bottom: 200px;
+    justify-content: flex-start;
+    padding-top: 6rem;
+    padding-bottom: 3rem;
+  }
+  .nav-container {
+    position: relative;
+    z-index: 2;
+  }
+  .price-summary {
+    max-width: calc(100% - 2rem);
+    margin: 0 1rem 1.5rem;
+    padding: 1rem;
+
+    .price-summary-content {
+      .price-label {
+        font-size: 0.9rem;
+      }
+
+      .price-amount {
+        font-size: 1.5rem;
+      }
+    }
+
+    .price-note {
+      font-size: 0.8rem;
+    }
   }
 }

@@ -1,15 +1,29 @@
 import React, { useState } from "react";
-import topbar from "../assets/Topbar.png";
+import { useParams } from "react-router-dom";
+import { getPropertyBySlug } from "../config/properties";
 import "../css/contact.scss";
 
 const Contact = () => {
+  const { propertySlug } = useParams();
+  const property = getPropertyBySlug(propertySlug);
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     message: "",
   });
-
   const [successMessage, setSuccessMessage] = useState(false);
+
+  if (!property) {
+    return (
+      <div className="contact-container">
+        <div className="error-container">
+          <h2>Property not found</h2>
+          <p>The property you’re trying to contact does not exist.</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleChange = (e) => {
     setFormData({
@@ -19,33 +33,21 @@ const Contact = () => {
   };
 
   const handleSubmit = async (e) => {
-    console.log("Form submit clicked");
     e.preventDefault();
-
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/contact`,
+        `${process.env.REACT_APP_API_URL}/api/contact/${property.id}`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData),
         }
       );
 
       if (response.ok) {
-        setFormData({
-          name: "",
-          email: "",
-          message: "",
-        });
+        setFormData({ name: "", email: "", message: "" });
         setSuccessMessage(true);
-
-        // Hide the success message after 5 seconds
-        setTimeout(() => {
-          setSuccessMessage(false);
-        }, 5000);
+        setTimeout(() => setSuccessMessage(false), 5000);
       } else {
         console.error("Error sending message.");
       }
@@ -56,7 +58,13 @@ const Contact = () => {
 
   return (
     <div className="contact-container">
-      <img src={topbar} className="topbar" />
+      {property.images?.topbar && (
+        <img
+          src={property.images.topbar}
+          className="topbar"
+          alt={`${property.name} top bar`}
+        />
+      )}
       <div className="contact-content">
         <form className="contact-form" onSubmit={handleSubmit}>
           <div className="contact">
@@ -93,17 +101,27 @@ const Contact = () => {
               onChange={handleChange}
               required
               rows="5"
-            ></textarea>
+            />
           </div>
           <button id="submit-button" type="submit" className="submit-button">
             Send
           </button>
         </form>
+
         {successMessage && (
           <p className="success-message">Message sent successfully!</p>
         )}
+
+        {property.contact?.email && (
+          <p className="contact-note">
+            Messages for <strong>{property.name}</strong> are sent to{" "}
+            <a href={`mailto:${property.contact.email}`}>
+              {property.contact.email}
+            </a>
+            .
+          </p>
+        )}
       </div>
-      {/* <Nav /> */}
     </div>
   );
 };

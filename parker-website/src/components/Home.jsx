@@ -1,26 +1,20 @@
 import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import { getPropertyBySlug } from "../config/properties";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 import "../css/home.scss";
 import { DateRange } from "react-date-range";
 import { eachDayOfInterval, parseISO, differenceInDays } from "date-fns";
 import { getEvents } from "../utils/fetch.js";
-import logo from "../assets/Bwythn_Preswylfa_Logo_Enhanced.png";
-import image1 from "../assets/2.jpg";
-import image2 from "../assets/3.jpg";
-import image3 from "../assets/54.jpg";
-import image4 from "../assets/20240324_170910.jpg";
-import image5 from "../assets/20240908_141632.jpg";
-import image6 from "../assets/IMG-20240520-WA0009.jpg";
-import image7 from "../assets/IMG-20240528-WA0000.jpg";
-import image8 from "../assets/SmartSelect_20240225_201528_Airbnb.jpg";
-import image9 from "../assets/SmartSelect_20240225_201536_Airbnb.jpg";
 import Button from "./Button.jsx";
 import ContactForm from "./ContactForm.jsx";
 import { Spinner } from "react-bootstrap";
-import emailjs from "emailjs-com";
 
 const Home = () => {
+  const { propertySlug } = useParams();
+  const property = getPropertyBySlug(propertySlug);
+
   const [bookings, setBookings] = useState([]);
   const [dateRange, setDateRange] = useState([
     {
@@ -45,39 +39,44 @@ const Home = () => {
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [showCleaningChargeMessage, setShowCleaningChargeMessage] =
     useState(false);
-
-  const images = [
-    image1,
-    image2,
-    image3,
-    image4,
-    image5,
-    image6,
-    image7,
-    image8,
-    image9,
-  ];
   const [totalPrice, setTotalPrice] = useState(null);
 
+  const images = property?.images?.hero || [];
+
+  // Fetch bookings for this property
   useEffect(() => {
-    // Fetch bookings
-    getEvents((fetchedEvents) => {
+    if (!property) return;
+    getEvents(property.id, (fetchedEvents) => {
       setBookings(fetchedEvents || []);
       setLoading(false);
     });
-  }, []);
+  }, [property.id]);
 
+  // Background slideshow
   useEffect(() => {
+    if (!images.length) return;
     const interval = setInterval(() => {
-      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
+      setCurrentImageIndex((prev) => (prev + 1) % images.length);
     }, 15000);
     return () => clearInterval(interval);
-  }, [images.length]);
+  }, [images]);
 
+  if (!property) {
+    return (
+      <div className="home-container">
+        <div className="error-container">
+          <h2>Property not found</h2>
+          <p>The property you’re trying to view doesn’t exist.</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Fetch total price from backend (property-specific)
   const fetchTotalPrice = async (startDate, endDate) => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/prices/total`,
+        `${process.env.REACT_APP_API_URL}/api/prices/total/${property.id}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -88,16 +87,15 @@ const Home = () => {
       if (response.ok) {
         const data = await response.json();
         let finalTotal = data.total;
-
-        // Apply £60 cleaning charge if stay is 3 nights or less
         const numNights = differenceInDays(
           new Date(endDate),
           new Date(startDate)
         );
-        if (numNights <= 3) {
-          finalTotal += 60;
-        }
 
+        // Property-specific cleaning charge
+        if (numNights <= property.pricing.cleaningChargeNights) {
+          finalTotal += property.pricing.cleaningCharge;
+        }
         setTotalPrice(finalTotal);
       } else {
         console.error("Failed to fetch total price");
@@ -107,13 +105,12 @@ const Home = () => {
     }
   };
 
+  // Disable booked dates
   const disabledDates = bookings.flatMap((booking) => {
     let start = booking.start;
     let end = booking.end;
-
     if (typeof start === "string") start = parseISO(start);
     if (typeof end === "string") end = parseISO(end);
-
     if (
       !(start instanceof Date) ||
       !(end instanceof Date) ||
@@ -126,19 +123,17 @@ const Home = () => {
       );
       return [];
     }
-
     return eachDayOfInterval({ start, end });
   });
 
   const isDisabledDate = (date) =>
-    disabledDates.some(
-      (disabledDate) => date.toDateString() === disabledDate.toDateString()
-    );
+    disabledDates.some((d) => date.toDateString() === d.toDateString());
 
   const handleSelect = (ranges) => {
     const newRange = ranges.selection;
     const numNights = differenceInDays(newRange.endDate, newRange.startDate);
 
+    // Check for conflicts
     if (
       eachDayOfInterval({
         start: newRange.startDate,
@@ -153,8 +148,8 @@ const Home = () => {
           key: "selection",
         },
       ]);
-      setFormData((prevFormData) => ({
-        ...prevFormData,
+      setFormData((prev) => ({
+        ...prev,
         startDate: "",
         endDate: "",
       }));
@@ -162,15 +157,16 @@ const Home = () => {
     } else {
       console.log("PASS");
       setDateRange([newRange]);
-      setFormData((prevFormData) => ({
-        ...prevFormData,
+      setFormData((prev) => ({
+        ...prev,
         startDate: newRange.startDate.toISOString(),
         endDate: newRange.endDate.toISOString(),
       }));
 
-      setShowCleaningChargeMessage(numNights <= 3);
+      setShowCleaningChargeMessage(
+        numNights <= property.pricing.cleaningChargeNights
+      );
 
-      // Fetch total price with new range
       fetchTotalPrice(
         newRange.startDate.toISOString().split("T")[0],
         newRange.endDate.toISOString().split("T")[0]
@@ -180,15 +176,11 @@ const Home = () => {
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleBooking = () => {
     const { startDate, endDate } = dateRange[0];
-
     if (
       !startDate ||
       !endDate ||
@@ -197,7 +189,6 @@ const Home = () => {
       alert("Please select a valid date range before proceeding.");
       return;
     }
-
     setToggle(!toggle);
   };
 
@@ -221,39 +212,29 @@ const Home = () => {
       };
 
       const calendarResponse = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/add-event`,
+        `${process.env.REACT_APP_API_URL}/api/add-event/${property.id}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(bookingData),
         }
       );
-
-      if (!calendarResponse.ok) {
-        throw new Error("Failed to add event to Google Calendar.");
-      }
+      if (!calendarResponse.ok) throw new Error("Failed to add event.");
 
       const emailResponse = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/send-booking-emails`,
+        `${process.env.REACT_APP_API_URL}/api/send-booking-emails/${property.id}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(bookingData),
         }
       );
+      if (!emailResponse.ok) throw new Error("Failed to send emails.");
 
-      if (!emailResponse.ok) {
-        throw new Error("Failed to send confirmation emails.");
-      }
-
-      setBookings((prevBookings) => [
-        ...prevBookings,
-        {
-          start: formData.startDate,
-          end: formData.endDate,
-        },
+      setBookings((prev) => [
+        ...prev,
+        { start: formData.startDate, end: formData.endDate },
       ]);
-
       setFormSubmitted(true);
       setTimeout(() => {
         setFormSubmitted(false);
@@ -265,18 +246,18 @@ const Home = () => {
     }
   };
 
+  // Custom day renderer (same as original)
   const customDayContentRenderer = (day) => {
     const isDisabled = isDisabledDate(day);
-    const isStartDate =
+    const isStart =
       dateRange[0].startDate.toDateString() === day.toDateString();
-    const isEndDate =
-      dateRange[0].endDate.toDateString() === day.toDateString();
+    const isEnd = dateRange[0].endDate.toDateString() === day.toDateString();
     const isSelected =
       day >= dateRange[0].startDate && day <= dateRange[0].endDate;
 
     let borderRadius = "0";
-    if (isStartDate) borderRadius = "20% 0 0 20%";
-    if (isEndDate) borderRadius = "0 20% 20% 0";
+    if (isStart) borderRadius = "20% 0 0 20%";
+    if (isEnd) borderRadius = "0 20% 20% 0";
 
     return (
       <div
@@ -293,6 +274,7 @@ const Home = () => {
             ? "green"
             : "inherit",
           color: isDisabled ? "white" : isSelected ? "white" : "inherit",
+          borderRadius,
         }}
       >
         {day.getDate()}
@@ -302,20 +284,29 @@ const Home = () => {
 
   return (
     <div className="home-container">
+      {/* Background slideshow */}
       <div className="background-container">
-        {images.map((image, index) => (
+        {images.map((img, index) => (
           <div
             key={index}
             className={`background-image ${
               index === currentImageIndex ? "visible" : ""
             }`}
-            style={{ backgroundImage: `url(${image})` }}
+            style={{ backgroundImage: `url(${img})` }}
           ></div>
         ))}
       </div>
+
       <div className="home-content">
-        <img src={logo} className="logo" alt="Logo" />
-        <h1>Welcome to Bwthyn Preswylfa</h1>
+        {property.images?.logo && (
+          <img
+            src={property.images.logo}
+            className="logo"
+            alt={`${property.name} logo`}
+          />
+        )}
+        <h1>Welcome to {property.name}</h1>
+
         {loading ? (
           <div className="loading-placeholder">
             <Spinner animation="border" variant="light" />
@@ -368,17 +359,24 @@ const Home = () => {
                 )}
               </div>
             )}
-            <Button
-              onClick={() => setToggle(!toggle)}
-              text="Next"
-              className="btn"
-            />
-            {showCleaningChargeMessage && (
-              <p className="cleaning-charge-message">
-                If booking 3 nights or less, there will be a £60 cleaning and
-                changeover charge added.
-              </p>
+
+            {totalPrice !== null && (
+              <div className="price-summary">
+                <div className="price-summary-content">
+                  <span className="price-label">Total Price</span>
+                  <span className="price-amount">£{totalPrice.toFixed(2)}</span>
+                </div>
+                {showCleaningChargeMessage && (
+                  <p className="price-note">
+                    Includes £{property.pricing.cleaningCharge} cleaning charge
+                    for stays of {property.pricing.cleaningChargeNights} nights
+                    or less
+                  </p>
+                )}
+              </div>
             )}
+
+            <Button onClick={handleBooking} text="Next" className="btn" />
           </>
         )}
       </div>
