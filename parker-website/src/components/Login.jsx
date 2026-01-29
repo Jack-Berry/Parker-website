@@ -1,6 +1,7 @@
 import React, { useState } from "react";
+import { useLocation } from "react-router-dom";
 import "../css/admin.scss";
-import { PROPERTIES } from "../config/properties"; // optional: for a default brand logo
+import { PROPERTIES, getPropertyBySlug } from "../config/properties";
 
 const Login = ({ setToken }) => {
   const [username, setUsername] = useState("");
@@ -8,10 +9,15 @@ const Login = ({ setToken }) => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  // Use a default brand logo if available (e.g., Preswylfa’s logo).
-  // Safe if you later change the default or add a dedicated site logo.
-  const defaultLogo = PROPERTIES?.preswylfa?.images?.logo || null;
-  const siteName = "Holiday Homes & Lets";
+  // Get propertySlug from navigation state (passed from Footer)
+  const location = useLocation();
+  const propertySlug = location.state?.propertySlug;
+  const property = propertySlug ? getPropertyBySlug(propertySlug) : null;
+
+  // Use property-specific logo if available, otherwise default to Preswylfa
+  const logo =
+    property?.images?.logo || PROPERTIES?.preswylfa?.images?.logo || null;
+  const siteName = property?.name || "Holiday Homes & Lets";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -31,6 +37,15 @@ const Login = ({ setToken }) => {
       }
 
       const data = await res.json();
+
+      // Store property info for Admin component to use
+      if (data.propertyId) {
+        localStorage.setItem("propertyId", data.propertyId);
+      }
+      if (data.displayName) {
+        localStorage.setItem("displayName", data.displayName);
+      }
+
       // Store token via parent state; ProtectedRoute persists it to localStorage.
       setToken(data.token);
     } catch (err) {
@@ -43,8 +58,8 @@ const Login = ({ setToken }) => {
 
   return (
     <form onSubmit={handleSubmit} className="login-container">
-      {defaultLogo ? (
-        <img src={defaultLogo} className="logo" alt={`${siteName} logo`} />
+      {logo ? (
+        <img src={logo} className="logo" alt={`${siteName} logo`} />
       ) : (
         <h1 className="logo-text">{siteName}</h1>
       )}

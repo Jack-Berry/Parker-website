@@ -24,7 +24,11 @@ const Footer = () => {
     : "/contact";
   const adminHref = "/admin";
 
-  const handleOwnerLogin = () => navigate(adminHref);
+  const handleOwnerLogin = () => {
+    console.log("Footer - propertySlug:", propertySlug);
+    console.log("Footer - property:", property);
+    navigate(adminHref, { state: { propertySlug } });
+  };
 
   const email = property?.contact?.email || "hello@holidayhomesandlets.co.uk";
   const addressLines = property?.contact?.addressLines || [
@@ -62,7 +66,14 @@ const Footer = () => {
             <a href={contactHref}>Contact Us</a>
           </li>
           <li>
-            <a href="/admin" className="linklike">
+            <a
+              onClick={(e) => {
+                e.preventDefault();
+                handleOwnerLogin();
+              }}
+              href="#"
+              className="linklike"
+            >
               Owner Login
             </a>
           </li>

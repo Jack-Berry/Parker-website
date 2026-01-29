@@ -1,3 +1,4 @@
+// src/components/Home.jsx
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { getPropertyBySlug } from "../config/properties";
@@ -6,7 +7,7 @@ import "react-date-range/dist/theme/default.css";
 import "../css/home.scss";
 import { DateRange } from "react-date-range";
 import { eachDayOfInterval, parseISO, differenceInDays } from "date-fns";
-import { getEvents } from "../utils/fetch.js";
+import { API_BASE_URL, getEvents } from "../utils/fetch";
 import Button from "./Button.jsx";
 import ContactForm from "./ContactForm.jsx";
 import { Spinner } from "react-bootstrap";
@@ -46,11 +47,12 @@ const Home = () => {
   // Fetch bookings for this property
   useEffect(() => {
     if (!property) return;
+
     getEvents(property.id, (fetchedEvents) => {
       setBookings(fetchedEvents || []);
       setLoading(false);
     });
-  }, [property.id]);
+  }, [property?.id, property]); // safe dependency usage
 
   // Background slideshow
   useEffect(() => {
@@ -76,12 +78,12 @@ const Home = () => {
   const fetchTotalPrice = async (startDate, endDate) => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/prices/total/${property.id}`,
+        `${API_BASE_URL}/api/prices/total/${property.id}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ startDate, endDate }),
-        }
+        },
       );
 
       if (response.ok) {
@@ -89,7 +91,7 @@ const Home = () => {
         let finalTotal = data.total;
         const numNights = differenceInDays(
           new Date(endDate),
-          new Date(startDate)
+          new Date(startDate),
         );
 
         // Property-specific cleaning charge
@@ -119,7 +121,7 @@ const Home = () => {
       start > end
     ) {
       console.warn(
-        `Skipping invalid interval: ${booking.start} - ${booking.end}`
+        `Skipping invalid interval: ${booking.start} - ${booking.end}`,
       );
       return [];
     }
@@ -164,12 +166,12 @@ const Home = () => {
       }));
 
       setShowCleaningChargeMessage(
-        numNights <= property.pricing.cleaningChargeNights
+        numNights <= property.pricing.cleaningChargeNights,
       );
 
       fetchTotalPrice(
         newRange.startDate.toISOString().split("T")[0],
-        newRange.endDate.toISOString().split("T")[0]
+        newRange.endDate.toISOString().split("T")[0],
       );
     }
   };
@@ -212,22 +214,22 @@ const Home = () => {
       };
 
       const calendarResponse = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/add-event/${property.id}`,
+        `${API_BASE_URL}/api/add-event/${property.id}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(bookingData),
-        }
+        },
       );
       if (!calendarResponse.ok) throw new Error("Failed to add event.");
 
       const emailResponse = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/send-booking-emails/${property.id}`,
+        `${API_BASE_URL}/api/send-booking-emails/${property.id}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(bookingData),
-        }
+        },
       );
       if (!emailResponse.ok) throw new Error("Failed to send emails.");
 
@@ -246,7 +248,6 @@ const Home = () => {
     }
   };
 
-  // Custom day renderer (same as original)
   const customDayContentRenderer = (day) => {
     const isDisabled = isDisabledDate(day);
     const isStart =
@@ -271,8 +272,8 @@ const Home = () => {
           backgroundColor: isDisabled
             ? "red"
             : isSelected
-            ? "green"
-            : "inherit",
+              ? "green"
+              : "inherit",
           color: isDisabled ? "white" : isSelected ? "white" : "inherit",
           borderRadius,
         }}
