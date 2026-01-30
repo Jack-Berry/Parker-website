@@ -240,7 +240,7 @@ export const PROPERTIES = {
 
   piddleInn: {
     id: "piddle-inn",
-    name: "Piddle Inn",
+    name: "escape the ordinary",
     slug: "piddle-inn",
 
     // Owner wants this exact casing from his copy
@@ -544,8 +544,8 @@ export const PROPERTIES = {
 
     // Contact/Booking
     contact: {
-      email: "hello@holidayhomesandlets.co.uk", // TODO: Confirm if different
-      adminEmail: "lucy@holidayhomesandlets.co.uk", // TODO: Update if dad has separate email
+      email: "dorset@holidayhomesandlets.co.uk",
+      adminEmail: "dorset@holidayhomesandlets.co.uk",
     },
 
     // Pricing rules (if property-specific)

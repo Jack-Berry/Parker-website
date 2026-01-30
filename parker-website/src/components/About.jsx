@@ -20,7 +20,29 @@ const About = () => {
   // Build gallery items from property config (safe defaults)
   const images = useMemo(() => {
     const gallery = property.images?.gallery ?? [];
-    return gallery.map((src) => ({ original: src, thumbnail: src }));
+
+    // Filter out "guide" images - these are used in Todo page
+    // Preswylfa guide keywords: tregele, food, beach
+    // Piddle Inn guide keywords: coast, village, heritage, museums, family, activity
+    const guideKeywords = [
+      "tregele",
+      "food",
+      "beach",
+      "coast-",
+      "village-",
+      "heritage-",
+      "museums-",
+      "family-",
+      "activity-",
+    ];
+
+    const filtered = gallery.filter((src) => {
+      const srcLower = src.toLowerCase();
+      // Exclude any image with guide keywords
+      return !guideKeywords.some((keyword) => srcLower.includes(keyword));
+    });
+
+    return filtered.map((src) => ({ original: src, thumbnail: src }));
   }, [property]);
 
   // Preload images for smoother UX (no-op if none)
@@ -170,7 +192,7 @@ const About = () => {
               onCloseRequest={() => setIsLightboxOpen(false)}
               onMovePrevRequest={() =>
                 setLightboxIndex(
-                  (lightboxIndex + images.length - 1) % images.length
+                  (lightboxIndex + images.length - 1) % images.length,
                 )
               }
               onMoveNextRequest={() =>

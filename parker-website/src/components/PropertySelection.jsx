@@ -2,6 +2,7 @@ import React, { useMemo, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { PROPERTY_LIST } from "../config/properties";
 import "../css/PropertySelection.scss";
+import logo from "../assets/HHAL Logo.png";
 
 const isBundledAsset = (url) =>
   typeof url === "string" &&
@@ -49,6 +50,11 @@ const PropertySelection = () => {
     <div className="ps-container">
       <div className="ps-content">
         <header className="ps-header panel">
+          <img
+            src={logo}
+            alt="Holiday Homes And Lets"
+            className="ps-site-logo"
+          />
           <h1 className="ps-title">Welcome to Holiday Homes &amp; Lets</h1>
           <p className="ps-subtitle">Choose your perfect holiday destination</p>
         </header>
