@@ -7,12 +7,19 @@
 /*
 ************END***********
 */
+
+// ============================================
+// ADMIN CONTAINER
+// ============================================
 .admin-container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
   background-color: $col-a;
 
+  // --------------------------------------------
+  // Header Section
+  // --------------------------------------------
   .admin-header {
     display: flex;
     justify-content: space-between;
@@ -23,6 +30,30 @@
       margin: 0;
       font-size: 28px;
       color: white;
+    }
+
+    .header-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .home-btn {
+      padding: 10px 20px;
+      background-color: $col-a;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition:
+        transform 0.2s,
+        box-shadow 0.2s;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+      }
     }
 
     .logout-btn {
@@ -42,7 +73,10 @@
     }
   }
 
-  .standard-price-section {
+  // --------------------------------------------
+  // Pricing Section (Standard + Weekend)
+  // --------------------------------------------
+  .pricing-section {
     background: white;
     padding: 25px;
     border-radius: 10px;
@@ -56,52 +90,126 @@
       color: #333;
     }
 
-    input[type="number"] {
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      font-size: 16px;
-      width: 150px;
-      margin-right: 10px;
-    }
+    .pricing-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
 
-    button {
-      padding: 10px 20px;
-      background-color: $col-a;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition:
-        transform 0.2s,
-        box-shadow 0.2s;
+      .pricing-input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
 
-      &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        label {
+          font-weight: 600;
+          color: #555;
+          font-size: 14px;
+        }
+
+        input[type="number"] {
+          padding: 10px;
+          border: 1px solid #ddd;
+          border-radius: 5px;
+          font-size: 16px;
+        }
+
+        button {
+          padding: 10px 20px;
+          background-color: $col-a;
+          color: white;
+          border: none;
+          border-radius: 5px;
+          font-size: 16px;
+          font-weight: 600;
+          cursor: pointer;
+          transition:
+            transform 0.2s,
+            box-shadow 0.2s;
+
+          &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+          }
+        }
       }
     }
   }
 
+  // --------------------------------------------
+  // Calendar Section
+  // --------------------------------------------
   .calendar-section {
     background: white;
     padding: 25px;
     border-radius: 10px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 
-    h2 {
-      margin-top: 0;
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       margin-bottom: 10px;
-      font-size: 22px;
-      color: #333;
+
+      h2 {
+        margin-top: 0;
+        margin-bottom: 0;
+        font-size: 22px;
+        color: #333;
+      }
+
+      .clear-month-btn {
+        padding: 8px 16px;
+        background-color: #ffc107;
+        color: #000;
+        border: none;
+        border-radius: 5px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 5px 15px rgba(255, 193, 7, 0.3);
+        }
+      }
     }
 
     .help-text {
       color: #666;
       font-size: 14px;
       margin-bottom: 20px;
+    }
+
+    .color-legend {
+      display: flex;
+      gap: 20px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+
+      .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+
+        .color-box {
+          width: 20px;
+          height: 20px;
+          border-radius: 3px;
+          border: 1px solid #ddd;
+
+          &.weekend {
+            background-color: #fff9e6;
+          }
+
+          &.custom {
+            background-color: #e3f2fd;
+          }
+        }
+      }
     }
 
     .rbc-calendar {
@@ -160,9 +268,180 @@
       font-size: 14px;
     }
   }
+
+  // --------------------------------------------
+  // Custom Dates Section
+  // --------------------------------------------
+  .custom-dates-section {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    margin-top: 30px;
+
+    .custom-dates-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 20px;
+      gap: 20px;
+
+      h2 {
+        margin: 0;
+        font-size: 22px;
+        color: #333;
+      }
+
+      .custom-dates-controls {
+        display: flex;
+        gap: 15px;
+        align-items: flex-end;
+        flex-wrap: wrap;
+
+        .filter-group {
+          display: flex;
+          flex-direction: column;
+          gap: 5px;
+
+          label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+          }
+
+          select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+            min-width: 180px;
+
+            &:focus {
+              outline: none;
+              border-color: $col-a;
+            }
+          }
+        }
+
+        .clear-filtered-month-btn {
+          padding: 8px 16px;
+          background-color: #ffc107;
+          color: #000;
+          border: none;
+          border-radius: 5px;
+          font-size: 14px;
+          font-weight: 600;
+          cursor: pointer;
+          transition:
+            transform 0.2s,
+            box-shadow 0.2s;
+          white-space: nowrap;
+
+          &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 193, 7, 0.3);
+          }
+        }
+      }
+    }
+
+    .filter-summary {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 15px;
+      font-style: italic;
+    }
+
+    .dates-list {
+      max-height: 400px;
+      overflow-y: auto;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+
+        th,
+        td {
+          padding: 12px 15px;
+          text-align: left;
+          border-bottom: 1px solid #f0f0f0;
+        }
+
+        th {
+          background-color: #f8f9fa;
+          font-weight: 600;
+          color: #555;
+          position: sticky;
+          top: 0;
+          z-index: 1;
+          border-bottom: 2px solid #ddd;
+        }
+
+        tbody tr {
+          transition: background-color 0.2s;
+
+          &:hover {
+            background-color: #f8f9fa;
+          }
+
+          &.weekend-row {
+            background-color: #fff9e6;
+
+            &:hover {
+              background-color: #fff3cd;
+            }
+          }
+
+          &:last-child td {
+            border-bottom: none;
+          }
+        }
+
+        td:first-child {
+          font-weight: 500;
+          color: #333;
+        }
+
+        td:nth-child(2) {
+          color: #666;
+          font-size: 13px;
+        }
+
+        td:nth-child(3) {
+          color: $col-a;
+          font-weight: 600;
+        }
+
+        .delete-btn {
+          padding: 6px 14px;
+          background-color: #dc3545;
+          color: white;
+          border: none;
+          border-radius: 5px;
+          font-size: 13px;
+          font-weight: 600;
+          cursor: pointer;
+          transition:
+            transform 0.2s,
+            box-shadow 0.2s;
+
+          &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
+          }
+        }
+      }
+    }
+  }
 }
 
-// Calendar customization
+// ============================================
+// REACT BIG CALENDAR CUSTOMIZATION
+// ============================================
 .rbc-calendar {
   font-family: inherit;
 
@@ -218,6 +497,8 @@
     padding: 2px 5px;
     font-size: 12px;
     font-weight: 600;
+    background: transparent !important;
+    border: none;
   }
 
   .rbc-off-range-bg {
@@ -225,54 +506,9 @@
   }
 }
 
-@media (max-width: 768px) {
-  .admin-container {
-    padding: 10px;
-
-    .admin-header {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 15px;
-
-      h1 {
-        font-size: 24px;
-      }
-    }
-
-    .standard-price-section,
-    .calendar-section {
-      padding: 15px;
-
-      h2 {
-        font-size: 20px;
-      }
-    }
-
-    .calendar-section {
-      .price-controls {
-        flex-direction: column;
-
-        input[type="number"],
-        button {
-          width: 100%;
-        }
-      }
-    }
-
-    .rbc-calendar {
-      .rbc-toolbar {
-        flex-direction: column;
-        gap: 10px;
-
-        .rbc-toolbar-label {
-          font-size: 18px;
-        }
-      }
-    }
-  }
-}
-
-// Login page styles
+// ============================================
+// LOGIN PAGE
+// ============================================
 .login-container {
   display: flex;
   flex-direction: column;
@@ -326,6 +562,129 @@
 
     &:disabled {
       opacity: 0.7;
+    }
+  }
+}
+
+// ============================================
+// MOBILE RESPONSIVE
+// ============================================
+@media (max-width: 768px) {
+  .admin-container {
+    padding: 10px;
+
+    .admin-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 15px;
+
+      h1 {
+        font-size: 24px;
+      }
+
+      .header-buttons {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .home-btn,
+      .logout-btn {
+        flex: 1;
+      }
+    }
+
+    .pricing-section {
+      padding: 15px;
+
+      .pricing-row {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+    }
+
+    .calendar-section {
+      padding: 15px;
+
+      h2 {
+        font-size: 20px;
+      }
+
+      .calendar-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+
+        .clear-month-btn {
+          width: 100%;
+        }
+      }
+
+      .price-controls {
+        flex-direction: column;
+
+        input[type="number"],
+        button {
+          width: 100%;
+        }
+      }
+    }
+
+    .custom-dates-section {
+      padding: 15px;
+
+      h2 {
+        font-size: 20px;
+      }
+
+      .custom-dates-header {
+        flex-direction: column;
+        align-items: flex-start;
+
+        .custom-dates-controls {
+          width: 100%;
+          flex-direction: column;
+
+          .filter-group {
+            width: 100%;
+
+            select {
+              width: 100%;
+              min-width: auto;
+            }
+          }
+
+          .clear-filtered-month-btn {
+            width: 100%;
+          }
+        }
+      }
+
+      .dates-list {
+        table {
+          font-size: 14px;
+
+          th,
+          td {
+            padding: 10px 8px;
+          }
+
+          .delete-btn {
+            padding: 5px 10px;
+            font-size: 12px;
+          }
+        }
+      }
+    }
+
+    .rbc-calendar {
+      .rbc-toolbar {
+        flex-direction: column;
+        gap: 10px;
+
+        .rbc-toolbar-label {
+          font-size: 18px;
+        }
+      }
     }
   }
 }
