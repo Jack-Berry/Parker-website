@@ -1,7 +1,13 @@
 // src/components/Home.jsx
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Navigate } from "react-router-dom";
 import { getPropertyBySlug } from "../config/properties";
+import SeoHead from "./SEO/SeoHead";
+import {
+  buildOrganizationSchema,
+  buildBreadcrumbSchema,
+  buildVacationRentalSchema,
+} from "./SEO/schema";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 import "../css/home.scss";
@@ -86,15 +92,9 @@ const Home = () => {
     }
   }, [formData.numberOfPets, formData.startDate, formData.endDate, property]);
 
-  if (!property) {
-    return (
-      <div className="home-container">
-        <div className="error-container">
-          <h2>Property not found</h2>
-          <p>The property you’re trying to view doesn’t exist.</p>
-        </div>
-      </div>
-    );
+  // Validate propertySlug (after all hooks)
+  if (!propertySlug || !property) {
+    return <Navigate to="/" replace />;
   }
 
   // Fetch total price from backend (property-specific)
@@ -369,180 +369,209 @@ const Home = () => {
     );
   };
 
+  // SEO content
+  const seoTitle = `${property.name} | Book Direct | Holiday Homes & Lets`;
+  const seoDescription = `Book ${property.name} direct with Holiday Homes & Lets. Check availability and book online.`;
+  const orgSchema = buildOrganizationSchema();
+  const breadcrumbSchema = buildBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: property.name, path: `/${propertySlug}` },
+  ]);
+  const rentalSchema = buildVacationRentalSchema(property);
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [orgSchema, breadcrumbSchema, rentalSchema],
+  };
+
   return (
-    <div className="home-container">
-      {/* Background slideshow */}
-      <div className="background-container">
-        {images.map((img, index) => (
-          <div
-            key={index}
-            className={`background-image ${
-              index === currentImageIndex ? "visible" : ""
-            }`}
-            style={{ backgroundImage: `url(${img})` }}
-          ></div>
-        ))}
-      </div>
+    <>
+      <SeoHead
+        title={seoTitle}
+        description={seoDescription}
+        canonicalPath={`/${propertySlug}`}
+        jsonLd={jsonLd}
+      />
 
-      <div className="home-content">
-        {property.images?.logo && (
-          <img
-            src={property.images.logo}
-            className="logo"
-            alt={`${property.name} logo`}
-          />
-        )}
-        <h1>Welcome to {property.name}</h1>
+      <div className="home-container">
+        {/* Background slideshow */}
+        <div className="background-container">
+          {images.map((img, index) => (
+            <div
+              key={index}
+              className={`background-image ${
+                index === currentImageIndex ? "visible" : ""
+              }`}
+              style={{ backgroundImage: `url(${img})` }}
+            ></div>
+          ))}
+        </div>
 
-        {loading ? (
-          <div className="loading-placeholder">
-            <Spinner animation="border" variant="light" />
-            <p>Getting dates...</p>
-          </div>
-        ) : (
-          <>
-            <DateRange
-              ranges={dateRange}
-              onChange={handleSelect}
-              disabledDay={isDisabledDate}
-              dayContentRenderer={customDayContentRenderer}
+        <div className="home-content">
+          {property.images?.logo && (
+            <img
+              src={property.images.logo}
+              className="logo"
+              alt={`${property.name} logo`}
             />
+          )}
+          <h1>Welcome to {property.name}</h1>
 
-            {toggle && (
-              <div className="contact-form-container">
-                {formSubmitted ? (
-                  <>
-                    <p className="success-message">
-                      Thank you! Your booking request has been submitted.
-                    </p>
-                    <p className="success-message">
-                      You will receive an email confirmation shortly.
-                    </p>
-                  </>
-                ) : (
-                  <>
-                    <ContactForm
-                      formData={formData}
-                      handleChange={handleFormChange}
-                    />
-                    <div className="total-price">
-                      {totalPrice !== null && (
-                        <p>
-                          Total: £{totalPrice.toFixed(2)}
+          {loading ? (
+            <div className="loading-placeholder">
+              <Spinner animation="border" variant="light" />
+              <p>Getting dates...</p>
+            </div>
+          ) : (
+            <>
+              <DateRange
+                ranges={dateRange}
+                onChange={handleSelect}
+                disabledDay={isDisabledDate}
+                dayContentRenderer={customDayContentRenderer}
+              />
+
+              {toggle && (
+                <div className="contact-form-container">
+                  {formSubmitted ? (
+                    <>
+                      <p className="success-message">
+                        Thank you! Your booking request has been submitted.
+                      </p>
+                      <p className="success-message">
+                        You will receive an email confirmation shortly.
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <ContactForm
+                        formData={formData}
+                        handleChange={handleFormChange}
+                      />
+                      <div className="total-price">
+                        {totalPrice !== null && (
+                          <p>
+                            Total: £{totalPrice.toFixed(2)}
+                            {securityDeposit && (
+                              <>
+                                {" "}
+                                + £{securityDeposit.toFixed(2)} refundable
+                                deposit
+                              </>
+                            )}
+                          </p>
+                        )}
+                      </div>
+                      <div className="contact-button-container">
+                        <Button
+                          onClick={handleSubmit}
+                          text="Submit Booking"
+                          className="tab col-c"
+                        />
+                        <Button
+                          onClick={() => setToggle(false)}
+                          text="Cancel"
+                          className="tab col-c"
+                        />
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
+
+              {(totalPrice !== null || showDealsInfo) && (
+                <div className="price-summary">
+                  {showDealsInfo ? (
+                    // Show deals info initially for properties with discounts
+                    <>
+                      <div className="price-summary-content">
+                        <span className="price-label">Special Offers</span>
+                      </div>
+                      <p className="price-note">
+                        {property.pricing.discounts?.map((discount, index) => (
+                          <span key={index}>
+                            {discount.nights}+ nights: {discount.percentage}%
+                            discount
+                            {index < property.pricing.discounts.length - 1 && (
+                              <br />
+                            )}
+                          </span>
+                        ))}
+                      </p>
+                      {property.pricing.minimumNights > 1 && (
+                        <p className="price-note" style={{ marginTop: "5px" }}>
+                          Minimum stay: {property.pricing.minimumNights} nights
+                        </p>
+                      )}
+                    </>
+                  ) : (
+                    // Show actual price after date selection
+                    <>
+                      <div className="price-summary-content">
+                        <span className="price-label">Total Price</span>
+                        <span className="price-amount">
+                          £{totalPrice.toFixed(2)}
                           {securityDeposit && (
-                            <>
+                            <span
+                              style={{
+                                fontSize: "0.9em",
+                                fontWeight: "normal",
+                              }}
+                            >
                               {" "}
                               + £{securityDeposit.toFixed(2)} refundable deposit
-                            </>
-                          )}
-                        </p>
-                      )}
-                    </div>
-                    <div className="contact-button-container">
-                      <Button
-                        onClick={handleSubmit}
-                        text="Submit Booking"
-                        className="tab col-c"
-                      />
-                      <Button
-                        onClick={() => setToggle(false)}
-                        text="Cancel"
-                        className="tab col-c"
-                      />
-                    </div>
-                  </>
-                )}
-              </div>
-            )}
-
-            {(totalPrice !== null || showDealsInfo) && (
-              <div className="price-summary">
-                {showDealsInfo ? (
-                  // Show deals info initially for properties with discounts
-                  <>
-                    <div className="price-summary-content">
-                      <span className="price-label">Special Offers</span>
-                    </div>
-                    <p className="price-note">
-                      {property.pricing.discounts?.map((discount, index) => (
-                        <span key={index}>
-                          {discount.nights}+ nights: {discount.percentage}%
-                          discount
-                          {index < property.pricing.discounts.length - 1 && (
-                            <br />
+                            </span>
                           )}
                         </span>
-                      ))}
-                    </p>
-                    {property.pricing.minimumNights > 1 && (
-                      <p className="price-note" style={{ marginTop: "5px" }}>
-                        Minimum stay: {property.pricing.minimumNights} nights
-                      </p>
-                    )}
-                  </>
-                ) : (
-                  // Show actual price after date selection
-                  <>
-                    <div className="price-summary-content">
-                      <span className="price-label">Total Price</span>
-                      <span className="price-amount">
-                        £{totalPrice.toFixed(2)}
-                        {securityDeposit && (
-                          <span
-                            style={{ fontSize: "0.9em", fontWeight: "normal" }}
-                          >
-                            {" "}
-                            + £{securityDeposit.toFixed(2)} refundable deposit
-                          </span>
-                        )}
-                      </span>
-                    </div>
-                    {property.pricing.type === "cleaning_charge" &&
-                      showCleaningChargeMessage && (
-                        <p className="price-note">
-                          Includes £{property.pricing.cleaningCharge} cleaning
-                          charge for stays of{" "}
-                          {property.pricing.cleaningChargeNights} nights or less
-                        </p>
-                      )}
-                    {property.pricing.type === "security_deposit" &&
-                      securityDeposit && (
-                        <>
-                          {appliedDiscount && (
-                            <p className="price-note">
-                              {appliedDiscount.percentage}% discount applied (
-                              {appliedDiscount.nights} nights)
-                            </p>
-                          )}
+                      </div>
+                      {property.pricing.type === "cleaning_charge" &&
+                        showCleaningChargeMessage && (
                           <p className="price-note">
-                            Security deposit: £
-                            {property.pricing.securityDepositBase} base
-                            {formData.numberOfPets &&
-                              parseInt(formData.numberOfPets) > 0 && (
-                                <>
-                                  {" "}
-                                  + £
-                                  {property.pricing.securityDepositPerPet *
-                                    parseInt(formData.numberOfPets)}
-                                  for {formData.numberOfPets} pet
-                                  {parseInt(formData.numberOfPets) > 1
-                                    ? "s"
-                                    : ""}
-                                </>
-                              )}
+                            Includes £{property.pricing.cleaningCharge} cleaning
+                            charge for stays of{" "}
+                            {property.pricing.cleaningChargeNights} nights or
+                            less
                           </p>
-                        </>
-                      )}
-                  </>
-                )}
-              </div>
-            )}
+                        )}
+                      {property.pricing.type === "security_deposit" &&
+                        securityDeposit && (
+                          <>
+                            {appliedDiscount && (
+                              <p className="price-note">
+                                {appliedDiscount.percentage}% discount applied (
+                                {appliedDiscount.nights} nights)
+                              </p>
+                            )}
+                            <p className="price-note">
+                              Security deposit: £
+                              {property.pricing.securityDepositBase} base
+                              {formData.numberOfPets &&
+                                parseInt(formData.numberOfPets) > 0 && (
+                                  <>
+                                    {" "}
+                                    + £
+                                    {property.pricing.securityDepositPerPet *
+                                      parseInt(formData.numberOfPets)}
+                                    for {formData.numberOfPets} pet
+                                    {parseInt(formData.numberOfPets) > 1
+                                      ? "s"
+                                      : ""}
+                                  </>
+                                )}
+                            </p>
+                          </>
+                        )}
+                    </>
+                  )}
+                </div>
+              )}
 
-            <Button onClick={handleBooking} text="Next" className="btn" />
-          </>
-        )}
+              <Button onClick={handleBooking} text="Next" className="btn" />
+            </>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

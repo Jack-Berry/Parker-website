@@ -1,6 +1,8 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { PROPERTY_LIST } from "../config/properties";
+import SeoHead from "./SEO/SeoHead";
+import { buildOrganizationSchema } from "./SEO/schema";
 import "../css/PropertySelection.scss";
 import logo from "../assets/HHAL Logo.png";
 
@@ -46,8 +48,21 @@ const CardSlideshow = ({ images = [], logo }) => {
 };
 
 const PropertySelection = () => {
+  const orgSchema = buildOrganizationSchema();
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [orgSchema],
+  };
+
   return (
-    <div className="ps-container">
+    <>
+      <SeoHead
+        title="Holiday Homes & Lets | Book Direct Holiday Homes"
+        description="Book direct holiday homes in Wales and England with Holiday Homes & Lets. Browse properties and check availability."
+        canonicalPath="/"
+        jsonLd={jsonLd}
+      />
+      <div className="ps-container">
       <div className="ps-content">
         <header className="ps-header panel">
           <img
@@ -120,6 +135,7 @@ const PropertySelection = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

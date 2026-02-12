@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
+import SeoHead from "./SEO/SeoHead";
 import "../css/admin.scss";
 import { PROPERTIES, getPropertyBySlug } from "../config/properties";
 
@@ -57,7 +58,13 @@ const Login = ({ setToken }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="login-container">
+    <>
+      <SeoHead
+        title="Login | Holiday Homes & Lets"
+        canonicalPath="/login"
+        robots="noindex, nofollow"
+      />
+      <form onSubmit={handleSubmit} className="login-container">
       {logo ? (
         <img src={logo} className="logo" alt={`${siteName} logo`} />
       ) : (
@@ -94,6 +101,7 @@ const Login = ({ setToken }) => {
         {submitting ? "Logging in…" : "Login"}
       </button>
     </form>
+    </>
   );
 };
 

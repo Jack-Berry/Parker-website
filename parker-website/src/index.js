@@ -7,6 +7,8 @@ import {
   useLocation,
   Navigate,
 } from "react-router-dom";
+import { HelmetProvider } from "react-helmet-async";
+
 import "./index.css";
 import reportWebVitals from "./reportWebVitals";
 
@@ -77,9 +79,11 @@ const App = () => {
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <BrowserRouter>
-    <App />
-  </BrowserRouter>,
+  <HelmetProvider>
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  </HelmetProvider>,
 );
 
 reportWebVitals();

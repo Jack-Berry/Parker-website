@@ -1,6 +1,11 @@
 import React, { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Navigate } from "react-router-dom";
 import { getPropertyBySlug } from "../config/properties";
+import SeoHead from "./SEO/SeoHead";
+import {
+  buildOrganizationSchema,
+  buildBreadcrumbSchema,
+} from "./SEO/schema";
 import "../css/contact.scss";
 
 const Contact = () => {
@@ -14,15 +19,9 @@ const Contact = () => {
   });
   const [successMessage, setSuccessMessage] = useState(false);
 
-  if (!property) {
-    return (
-      <div className="contact-container">
-        <div className="error-container">
-          <h2>Property not found</h2>
-          <p>The property you’re trying to contact does not exist.</p>
-        </div>
-      </div>
-    );
+  // Validate propertySlug (after all hooks)
+  if (!propertySlug || !property) {
+    return <Navigate to="/" replace />;
   }
 
   const handleChange = (e) => {
@@ -56,16 +55,38 @@ const Contact = () => {
     }
   };
 
+  // SEO content
+  const seoTitle = `Contact | ${property.name} | Holiday Homes & Lets`;
+  const seoDescription = `Contact Holiday Homes & Lets about ${property.name}.`;
+  const orgSchema = buildOrganizationSchema();
+  const breadcrumbSchema = buildBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: property.name, path: `/${propertySlug}` },
+    { name: "Contact", path: `/${propertySlug}/contact` },
+  ]);
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [orgSchema, breadcrumbSchema],
+  };
+
   return (
-    <div className="contact-container">
-      {property.images?.topbar && (
-        <img
-          src={property.images.topbar}
-          className="topbar"
-          alt={`${property.name} top bar`}
-        />
-      )}
-      <div className="contact-content">
+    <>
+      <SeoHead
+        title={seoTitle}
+        description={seoDescription}
+        canonicalPath={`/${propertySlug}/contact`}
+        jsonLd={jsonLd}
+      />
+      <div className="contact-container">
+        {property.images?.topbar && (
+          <img
+            src={property.images.topbar}
+            className="topbar"
+            alt={`${property.name} top bar`}
+          />
+        )}
+        <div className="contact-content">
         <form className="contact-form" onSubmit={handleSubmit}>
           <div className="contact">
             <label htmlFor="name">Name</label>
@@ -121,8 +142,9 @@ const Contact = () => {
             .
           </p>
         )}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

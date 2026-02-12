@@ -1,13 +1,18 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Navigate } from "react-router-dom";
 import { getPropertyBySlug } from "../config/properties";
+import SeoHead from "./SEO/SeoHead";
+import {
+  buildOrganizationSchema,
+  buildBreadcrumbSchema,
+} from "./SEO/schema";
 import "../css/todo.scss";
 
 const Todo = () => {
   const { propertySlug } = useParams();
   const property = getPropertyBySlug(propertySlug);
 
-  const gallery = property.images?.gallery || [];
+  const gallery = property?.images?.gallery || [];
 
   // Build sections from config.guide if present; otherwise fall back
   const sections = useMemo(() => {
@@ -64,28 +69,44 @@ const Todo = () => {
     ];
   }, [property, gallery]);
 
-  if (!property) {
-    return (
-      <div className="todo-container">
-        <div className="error-container">
-          <h2>Property not found</h2>
-          <p>The property you’re trying to view does not exist.</p>
-        </div>
-      </div>
-    );
+  // Validate propertySlug (after all hooks)
+  if (!propertySlug || !property) {
+    return <Navigate to="/" replace />;
   }
 
-  return (
-    <div className="todo-container">
-      {property.images?.topbar && (
-        <img
-          src={property.images.topbar}
-          className="topbar"
-          alt={`${property.name} top bar`}
-        />
-      )}
+  // SEO content
+  const seoTitle = `What to do near ${property.name} | Holiday Homes & Lets`;
+  const seoDescription = `Discover things to do near ${property.name} during your stay.`;
+  const orgSchema = buildOrganizationSchema();
+  const breadcrumbSchema = buildBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: property.name, path: `/${propertySlug}` },
+    { name: "What to Do", path: `/${propertySlug}/what-to-do` },
+  ]);
 
-      {sections.map((section, index) => (
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [orgSchema, breadcrumbSchema],
+  };
+
+  return (
+    <>
+      <SeoHead
+        title={seoTitle}
+        description={seoDescription}
+        canonicalPath={`/${propertySlug}/what-to-do`}
+        jsonLd={jsonLd}
+      />
+      <div className="todo-container">
+        {property.images?.topbar && (
+          <img
+            src={property.images.topbar}
+            className="topbar"
+            alt={`${property.name} top bar`}
+          />
+        )}
+
+        {sections.map((section, index) => (
         <AutoTransitionSection
           key={index}
           title={section.title}
@@ -104,8 +125,9 @@ const Todo = () => {
             </ul>
           )}
         </AutoTransitionSection>
-      ))}
-    </div>
+        ))}
+      </div>
+    </>
   );
 };
 

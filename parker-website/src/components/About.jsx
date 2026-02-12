@@ -1,6 +1,11 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Navigate } from "react-router-dom";
 import { getPropertyBySlug } from "../config/properties";
+import SeoHead from "./SEO/SeoHead";
+import {
+  buildOrganizationSchema,
+  buildBreadcrumbSchema,
+} from "./SEO/schema";
 import "../css/about.scss";
 
 import ImageGallery from "react-image-gallery";
@@ -70,16 +75,9 @@ const About = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Guard: invalid or missing property
-  if (!property) {
-    return (
-      <div className="about-container">
-        <div className="error-container">
-          <h2>Property not found</h2>
-          <p>The property you’re looking for does not exist.</p>
-        </div>
-      </div>
-    );
+  // Validate propertySlug (after all hooks)
+  if (!propertySlug || !property) {
+    return <Navigate to="/" replace />;
   }
 
   // Render gallery view
@@ -125,18 +123,40 @@ const About = () => {
 
   const { description, details, amenities, accessibility, location } = property;
 
-  return (
-    <div className="about-container">
-      {/* Optional topbar image */}
-      {property.images?.topbar && (
-        <img
-          src={property.images.topbar}
-          className="topbar"
-          alt={`${property.name} top bar`}
-        />
-      )}
+  // SEO content
+  const seoTitle = `About ${property.name} | Holiday Homes & Lets`;
+  const seoDescription = `Learn more about ${property.name}. Facilities, location and details.`;
+  const orgSchema = buildOrganizationSchema();
+  const breadcrumbSchema = buildBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: property.name, path: `/${propertySlug}` },
+    { name: "About", path: `/${propertySlug}/about` },
+  ]);
 
-      <div className="about-content">
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [orgSchema, breadcrumbSchema],
+  };
+
+  return (
+    <>
+      <SeoHead
+        title={seoTitle}
+        description={seoDescription}
+        canonicalPath={`/${propertySlug}/about`}
+        jsonLd={jsonLd}
+      />
+      <div className="about-container">
+        {/* Optional topbar image */}
+        {property.images?.topbar && (
+          <img
+            src={property.images.topbar}
+            className="topbar"
+            alt={`${property.name} top bar`}
+          />
+        )}
+
+        <div className="about-content">
         <div className="feature-container">
           <div className="split-container">
             <div className="title-container">
@@ -298,8 +318,9 @@ const About = () => {
             />
           </div>
         )}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

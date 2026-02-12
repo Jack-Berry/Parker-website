@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
+import SeoHead from "./SEO/SeoHead";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "../css/admin.scss";
 
@@ -455,7 +456,13 @@ const Admin = ({ onLogout }) => {
   }
 
   return (
-    <div className="admin-container">
+    <>
+      <SeoHead
+        title="Admin Dashboard | Holiday Homes & Lets"
+        canonicalPath="/admin/dashboard"
+        robots="noindex, nofollow"
+      />
+      <div className="admin-container">
       <div className="admin-header">
         <h1>Admin - {propertyInfo?.displayName}</h1>
         <div className="header-buttons">
@@ -657,6 +664,7 @@ const Admin = ({ onLogout }) => {
         )}
       </div>
     </div>
+    </>
   );
 };
 
