@@ -1,3 +1,10 @@
-# https://www.robotstxt.org/robotstxt.html
+# Allow all crawlers
 User-agent: *
-Disallow:
+Allow: /
+
+# Block admin pages
+Disallow: /admin
+Disallow: /login
+
+# Sitemap location
+Sitemap: https://www.holidayhomesandlets.co.uk/sitemap.xml
