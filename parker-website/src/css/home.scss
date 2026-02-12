@@ -88,7 +88,7 @@
   border-radius: 8px;
   padding: 1rem 1.25rem;
   margin: -8px auto 1.5rem;
-  max-width: 300px;
+  max-width: 350px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   border-top: 1px solid #e5e7eb;
 
@@ -97,6 +97,7 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 0;
+    width: 100%;
 
     .price-label {
       font-size: 0.95rem;
@@ -190,8 +191,8 @@ h1 {
 .contact-form {
   max-width: 800px;
   height: 80%;
-  margin: 10px auto;
-  padding: 20px;
+  // margin: 10px auto;
+  // padding: 20px;
   padding-bottom: 0;
   background-color: "#f9f9f9";
   border: "1px solid #ddd";
@@ -213,21 +214,32 @@ h1 {
   justify-content: center;
   align-items: center;
   width: 100%;
+
   h2 {
     color: white;
+    margin-bottom: 5px; // Reduce space below "You are booking" text
+  }
+
+  // Last contact field (with booking dates) - reduce bottom margin
+  &:last-of-type {
+    margin-bottom: 5px;
   }
 }
 
 .total-price {
   color: white;
-  font-size: 20px;
+  font-size: 22px;
   font-weight: bold;
-  border-top: 2px solid white;
-  border-bottom: 2px solid white;
-  margin-bottom: 50px;
-  height: 60px;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 12px 20px;
+  border-radius: 8px;
+  margin: 0px auto 10px auto; // No top margin - reduces gap with "You are booking" text
+  max-width: 90%;
+
   p {
-    border: none;
+    margin: 0;
+    line-height: 1.4;
   }
 }
 
@@ -312,8 +324,7 @@ h1 {
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    gap: 232px;
-    transform: translateY(-130px);
+    gap: 50px;
 
     .btn {
       width: 25%;
@@ -325,6 +336,10 @@ h1 {
   .home-content {
     width: 60%;
     left: 20%;
+  }
+
+  .price-summary-content {
+    min-width: 200px;
   }
 }
 
@@ -338,6 +353,23 @@ h1 {
     position: relative;
     z-index: 2;
   }
+
+  .total-price {
+    font-size: 18px;
+    padding: 10px 15px;
+    margin: 8px auto 8px auto;
+    max-width: 95%;
+  }
+
+  .contact-button-container {
+    flex-direction: column;
+    gap: 15px;
+
+    .btn {
+      width: 80% !important;
+    }
+  }
+
   .price-summary {
     max-width: calc(100% - 2rem);
     margin: 0 1rem 1.5rem;

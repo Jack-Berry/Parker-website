@@ -41,6 +41,12 @@ const Home = () => {
   const [showCleaningChargeMessage, setShowCleaningChargeMessage] =
     useState(false);
   const [totalPrice, setTotalPrice] = useState(null);
+  const [securityDeposit, setSecurityDeposit] = useState(null);
+  const [showDealsInfo, setShowDealsInfo] = useState(
+    property?.pricing?.type === "security_deposit" &&
+      property?.pricing?.discounts,
+  );
+  const [appliedDiscount, setAppliedDiscount] = useState(null);
 
   const images = property?.images?.hero || [];
 
@@ -63,6 +69,23 @@ const Home = () => {
     return () => clearInterval(interval);
   }, [images]);
 
+  // Recalculate price when numberOfPets changes (for security deposit properties)
+  useEffect(() => {
+    if (
+      property?.pricing?.type === "security_deposit" &&
+      formData.startDate &&
+      formData.endDate &&
+      formData.numberOfPets !== ""
+    ) {
+      const petsCount = parseInt(formData.numberOfPets) || 0;
+      fetchTotalPrice(
+        formData.startDate.split("T")[0],
+        formData.endDate.split("T")[0],
+        petsCount,
+      );
+    }
+  }, [formData.numberOfPets, formData.startDate, formData.endDate, property]);
+
   if (!property) {
     return (
       <div className="home-container">
@@ -75,14 +98,14 @@ const Home = () => {
   }
 
   // Fetch total price from backend (property-specific)
-  const fetchTotalPrice = async (startDate, endDate) => {
+  const fetchTotalPrice = async (startDate, endDate, numberOfPets = 0) => {
     try {
       const response = await fetch(
         `${API_BASE_URL}/api/prices/total/${property.id}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ startDate, endDate }),
+          body: JSON.stringify({ startDate, endDate, numberOfPets }),
         },
       );
 
@@ -94,11 +117,46 @@ const Home = () => {
           new Date(startDate),
         );
 
-        // Property-specific cleaning charge
-        if (numNights <= property.pricing.cleaningChargeNights) {
-          finalTotal += property.pricing.cleaningCharge;
+        // Property-specific pricing
+        if (property.pricing.type === "cleaning_charge") {
+          if (numNights <= property.pricing.cleaningChargeNights) {
+            finalTotal += property.pricing.cleaningCharge;
+          }
+          setTotalPrice(finalTotal);
+          setSecurityDeposit(null);
+          setAppliedDiscount(null);
+        } else if (property.pricing.type === "security_deposit") {
+          // Calculate discount if applicable (BEFORE adding security deposit)
+          let discountPercentage = 0;
+          if (property.pricing.discounts) {
+            // Find the highest applicable discount (discounts array is sorted highest first)
+            for (const discount of property.pricing.discounts) {
+              if (numNights >= discount.nights) {
+                discountPercentage = discount.percentage;
+                break;
+              }
+            }
+          }
+
+          if (discountPercentage > 0) {
+            const discountAmount = finalTotal * (discountPercentage / 100);
+            finalTotal = finalTotal - discountAmount;
+            setAppliedDiscount({
+              percentage: discountPercentage,
+              nights: numNights,
+            });
+          } else {
+            setAppliedDiscount(null);
+          }
+
+          // Calculate security deposit separately (NOT discounted)
+          const deposit =
+            property.pricing.securityDepositBase +
+            numberOfPets * property.pricing.securityDepositPerPet;
+          setTotalPrice(finalTotal);
+          setSecurityDeposit(deposit);
+          setShowDealsInfo(false); // Hide deals info once price is shown
         }
-        setTotalPrice(finalTotal);
       } else {
         console.error("Failed to fetch total price");
       }
@@ -156,6 +214,14 @@ const Home = () => {
         endDate: "",
       }));
       setTotalPrice(null);
+      setSecurityDeposit(null);
+      // Restore deals info for security deposit properties
+      if (
+        property.pricing?.type === "security_deposit" &&
+        property.pricing?.discounts
+      ) {
+        setShowDealsInfo(true);
+      }
     } else {
       console.log("PASS");
       setDateRange([newRange]);
@@ -165,13 +231,21 @@ const Home = () => {
         endDate: newRange.endDate.toISOString(),
       }));
 
-      setShowCleaningChargeMessage(
-        numNights <= property.pricing.cleaningChargeNights,
-      );
+      // Set message based on pricing type
+      if (property.pricing.type === "cleaning_charge") {
+        setShowCleaningChargeMessage(
+          numNights <= property.pricing.cleaningChargeNights,
+        );
+      } else {
+        setShowCleaningChargeMessage(false);
+      }
 
+      // Fetch price with current numberOfPets (default 0 for initial selection)
+      const petsCount = parseInt(formData.numberOfPets) || 0;
       fetchTotalPrice(
         newRange.startDate.toISOString().split("T")[0],
         newRange.endDate.toISOString().split("T")[0],
+        petsCount,
       );
     }
   };
@@ -191,6 +265,17 @@ const Home = () => {
       alert("Please select a valid date range before proceeding.");
       return;
     }
+
+    // Check minimum nights requirement
+    const numNights = differenceInDays(endDate, startDate);
+    const minimumNights = property.pricing?.minimumNights || 1;
+    if (numNights < minimumNights) {
+      alert(
+        `Minimum stay is ${minimumNights} night${minimumNights > 1 ? "s" : ""}.`,
+      );
+      return;
+    }
+
     setToggle(!toggle);
   };
 
@@ -205,6 +290,7 @@ const Home = () => {
         summary: `Booking for ${formData.name}`,
         description: `Name: ${formData.name}, Email: ${formData.email}, Phone: ${formData.telephone}, Guests: ${formData.numberOfPeople}, Pets: ${formData.numberOfPets}, Message: ${formData.message}`,
         totalPrice,
+        securityDeposit,
         name: formData.name,
         email: formData.email,
         numberOfPeople: formData.numberOfPeople,
@@ -341,7 +427,15 @@ const Home = () => {
                     />
                     <div className="total-price">
                       {totalPrice !== null && (
-                        <p>Total: £{totalPrice.toFixed(2)}</p>
+                        <p>
+                          Total: £{totalPrice.toFixed(2)}
+                          {securityDeposit && (
+                            <>
+                              {" "}
+                              + £{securityDeposit.toFixed(2)} refundable deposit
+                            </>
+                          )}
+                        </p>
                       )}
                     </div>
                     <div className="contact-button-container">
@@ -361,18 +455,85 @@ const Home = () => {
               </div>
             )}
 
-            {totalPrice !== null && (
+            {(totalPrice !== null || showDealsInfo) && (
               <div className="price-summary">
-                <div className="price-summary-content">
-                  <span className="price-label">Total Price</span>
-                  <span className="price-amount">£{totalPrice.toFixed(2)}</span>
-                </div>
-                {showCleaningChargeMessage && (
-                  <p className="price-note">
-                    Includes £{property.pricing.cleaningCharge} cleaning charge
-                    for stays of {property.pricing.cleaningChargeNights} nights
-                    or less
-                  </p>
+                {showDealsInfo ? (
+                  // Show deals info initially for properties with discounts
+                  <>
+                    <div className="price-summary-content">
+                      <span className="price-label">Special Offers</span>
+                    </div>
+                    <p className="price-note">
+                      {property.pricing.discounts?.map((discount, index) => (
+                        <span key={index}>
+                          {discount.nights}+ nights: {discount.percentage}%
+                          discount
+                          {index < property.pricing.discounts.length - 1 && (
+                            <br />
+                          )}
+                        </span>
+                      ))}
+                    </p>
+                    {property.pricing.minimumNights > 1 && (
+                      <p className="price-note" style={{ marginTop: "5px" }}>
+                        Minimum stay: {property.pricing.minimumNights} nights
+                      </p>
+                    )}
+                  </>
+                ) : (
+                  // Show actual price after date selection
+                  <>
+                    <div className="price-summary-content">
+                      <span className="price-label">Total Price</span>
+                      <span className="price-amount">
+                        £{totalPrice.toFixed(2)}
+                        {securityDeposit && (
+                          <span
+                            style={{ fontSize: "0.9em", fontWeight: "normal" }}
+                          >
+                            {" "}
+                            + £{securityDeposit.toFixed(2)} refundable deposit
+                          </span>
+                        )}
+                      </span>
+                    </div>
+                    {property.pricing.type === "cleaning_charge" &&
+                      showCleaningChargeMessage && (
+                        <p className="price-note">
+                          Includes £{property.pricing.cleaningCharge} cleaning
+                          charge for stays of{" "}
+                          {property.pricing.cleaningChargeNights} nights or less
+                        </p>
+                      )}
+                    {property.pricing.type === "security_deposit" &&
+                      securityDeposit && (
+                        <>
+                          {appliedDiscount && (
+                            <p className="price-note">
+                              {appliedDiscount.percentage}% discount applied (
+                              {appliedDiscount.nights} nights)
+                            </p>
+                          )}
+                          <p className="price-note">
+                            Security deposit: £
+                            {property.pricing.securityDepositBase} base
+                            {formData.numberOfPets &&
+                              parseInt(formData.numberOfPets) > 0 && (
+                                <>
+                                  {" "}
+                                  + £
+                                  {property.pricing.securityDepositPerPet *
+                                    parseInt(formData.numberOfPets)}
+                                  for {formData.numberOfPets} pet
+                                  {parseInt(formData.numberOfPets) > 1
+                                    ? "s"
+                                    : ""}
+                                </>
+                              )}
+                          </p>
+                        </>
+                      )}
+                  </>
                 )}
               </div>
             )}

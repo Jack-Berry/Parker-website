@@ -20,7 +20,6 @@ import Nav from "./components/Nav";
 import Admin from "./components/Admin";
 import Login from "./components/Login";
 import PropertySelection from "./components/PropertySelection";
-import ConditionalProtection from "./components/ConditionalProtection";
 
 /* ---------- Utility Components ---------- */
 
@@ -56,44 +55,15 @@ const App = () => {
       <Routes>
         <Route path="/" element={<PropertySelection />} />
 
-        {/* Use dynamic :propertySlug route */}
-        <Route
-          path="/property/:propertySlug"
-          element={
-            <ConditionalProtection>
-              <Home />
-            </ConditionalProtection>
-          }
-        />
-        <Route
-          path="/property/:propertySlug/about"
-          element={
-            <ConditionalProtection>
-              <About />
-            </ConditionalProtection>
-          }
-        />
-        <Route
-          path="/property/:propertySlug/what-to-do"
-          element={
-            <ConditionalProtection>
-              <Todo />
-            </ConditionalProtection>
-          }
-        />
-        <Route
-          path="/property/:propertySlug/contact"
-          element={
-            <ConditionalProtection>
-              <Contact />
-            </ConditionalProtection>
-          }
-        />
-
-        {/* Admin */}
+        {/* Admin routes MUST come before dynamic slug routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/admin" element={<ProtectedRoute />} />
         <Route path="/admin/dashboard" element={<Admin />} />
+
+        <Route path="/:propertySlug" element={<Home />} />
+        <Route path="/:propertySlug/about" element={<About />} />
+        <Route path="/:propertySlug/what-to-do" element={<Todo />} />
+        <Route path="/:propertySlug/contact" element={<Contact />} />
 
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
@@ -109,7 +79,7 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <BrowserRouter>
     <App />
-  </BrowserRouter>
+  </BrowserRouter>,
 );
 
 reportWebVitals();

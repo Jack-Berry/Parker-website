@@ -233,6 +233,7 @@ export const PROPERTIES = {
 
     // Pricing rules (if property-specific)
     pricing: {
+      type: "cleaning_charge",
       cleaningChargeNights: 3, // Apply £60 charge if stay is <= this many nights
       cleaningCharge: 60,
     },
@@ -550,8 +551,14 @@ export const PROPERTIES = {
 
     // Pricing rules (if property-specific)
     pricing: {
-      cleaningChargeNights: 3, // Adjust if different from Preswylfa
-      cleaningCharge: 60, // Adjust if different from Preswylfa
+      type: "security_deposit",
+      securityDepositBase: 300, // Base security deposit per booking
+      securityDepositPerPet: 50, // Additional deposit per pet
+      minimumNights: 2, // Minimum booking length
+      discounts: [
+        { nights: 28, percentage: 30 }, // 30% off for 28+ nights
+        { nights: 7, percentage: 20 }, // 20% off for 7+ nights
+      ],
     },
   },
 };

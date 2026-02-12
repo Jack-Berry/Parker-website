@@ -74,7 +74,7 @@ const PropertySelection = () => {
             return (
               <Link
                 key={property.id}
-                to={`/property/${property.slug}`}
+                to={`/${property.slug}`}
                 className="ps-card panel"
               >
                 <div className="ps-card-media">
