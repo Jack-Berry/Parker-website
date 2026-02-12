@@ -8,8 +8,8 @@ const Nav = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Derive slug from pathname, e.g. /property/preswylfa/...
-  const match = location.pathname.match(/^\/property\/([^/]+)/);
+  // Derive slug from pathname, e.g. /piddle-inn/...
+  const match = location.pathname.match(/^\/([^/]+)/);
   const propertySlug = match ? match[1] : null;
   const property = propertySlug ? getPropertyBySlug(propertySlug) : null;
 
@@ -20,22 +20,22 @@ const Nav = () => {
       {propertySlug ? (
         <>
           <Button
-            onClick={() => goto(`/property/${propertySlug}`)}
+            onClick={() => goto(`/${propertySlug}`)}
             text="Book"
             className="tab"
           />
           <Button
-            onClick={() => goto(`/property/${propertySlug}/about`)}
+            onClick={() => goto(`/${propertySlug}/about`)}
             text="About"
             className="tab"
           />
           <Button
-            onClick={() => goto(`/property/${propertySlug}/what-to-do`)}
+            onClick={() => goto(`/${propertySlug}/what-to-do`)}
             text="What to do"
             className="tab"
           />
           <Button
-            onClick={() => goto(`/property/${propertySlug}/contact`)}
+            onClick={() => goto(`/${propertySlug}/contact`)}
             text="Contact"
             className="tab"
           />

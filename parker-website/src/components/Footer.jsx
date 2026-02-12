@@ -9,19 +9,15 @@ const Footer = () => {
   const navigate = useNavigate();
 
   // Derive slug from the current URL (Footer is outside <Routes/>)
-  const match = location.pathname.match(/^\/property\/([^/]+)/);
+  const match = location.pathname.match(/^\/([^/]+)/);
   const propertySlug = match ? match[1] : null;
   const property = propertySlug ? getPropertyBySlug(propertySlug) : null;
 
   // Build scoped links
-  const homeHref = propertySlug ? `/property/${propertySlug}` : "/";
-  const aboutHref = propertySlug ? `/property/${propertySlug}/about` : "/about";
-  const todoHref = propertySlug
-    ? `/property/${propertySlug}/what-to-do`
-    : "/what-to-do";
-  const contactHref = propertySlug
-    ? `/property/${propertySlug}/contact`
-    : "/contact";
+  const homeHref = propertySlug ? `/${propertySlug}` : "/";
+  const aboutHref = propertySlug ? `/${propertySlug}/about` : "/about";
+  const todoHref = propertySlug ? `/${propertySlug}/what-to-do` : "/what-to-do";
+  const contactHref = propertySlug ? `/${propertySlug}/contact` : "/contact";
   const adminHref = "/admin";
 
   const handleOwnerLogin = () => {
