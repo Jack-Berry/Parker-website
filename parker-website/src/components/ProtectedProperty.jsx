@@ -15,7 +15,7 @@ const ProtectedProperty = ({ propertyId, children }) => {
   }, [propertyId]);
 
   const handleLogin = () => {
-    const TEMP_PASSWORD = process.env.REACT_APP_TEMP_PASS;
+    const TEMP_PASSWORD = import.meta.env.VITE_TEMP_PASS;
 
     if (input === TEMP_PASSWORD) {
       localStorage.setItem(`auth_${propertyId}`, "granted");

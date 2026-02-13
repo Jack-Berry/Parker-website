@@ -6,7 +6,7 @@ const Temp = ({ onSuccess }) => {
   const [error, setError] = useState("");
 
   const handleLogin = () => {
-    const TEMP_PASSWORD = process.env.REACT_APP_TEMP_PASS; // Replace with your desired password
+    const TEMP_PASSWORD = import.meta.env.VITE_TEMP_PASS; // Replace with your desired password
     if (input === TEMP_PASSWORD) {
       onSuccess(); // Trigger the success callback
     } else {

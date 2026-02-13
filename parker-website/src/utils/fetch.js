@@ -1,12 +1,11 @@
 // src/utils/fetch.js
-import request from "superagent";
 
 /**
  * Centralised backend base URL.
  *
  * Priority:
- * 1) REACT_APP_API_BASE_URL (preferred, new)
- * 2) REACT_APP_API_URL      (legacy, existing)
+ * 1) VITE_API_BASE_URL (preferred, new)
+ * 2) VITE_API_URL      (legacy, existing)
  * 3) https://holidayhomesandlets.co.uk (default)
  *
  * That means: unless you explicitly override one of the env vars,
@@ -14,13 +13,13 @@ import request from "superagent";
  * live backend at https://holidayhomesandlets.co.uk.
  */
 export const API_BASE_URL =
-  process.env.REACT_APP_API_BASE_URL ||
-  process.env.REACT_APP_API_URL ||
+  import.meta.env.VITE_API_BASE_URL ||
+  import.meta.env.VITE_API_URL ||
   "https://holidayhomesandlets.co.uk";
 
 /**
  * Small helper in case you ever want the base URL as a function.
- * (Doesn’t change any existing behaviour; purely additive.)
+ * (Doesn't change any existing behaviour; purely additive.)
  */
 export function getApiBaseUrl() {
   return API_BASE_URL;
@@ -42,19 +41,14 @@ export function getEvents(propertyId, callback) {
 
   console.log("Fetching events from URL:", url);
 
-  request.get(url).end((err, resp) => {
-    if (err) {
-      console.error("Error fetching events:", err);
-      if (typeof callback === "function") callback([]);
-      return;
-    }
-
-    try {
-      // superagent usually gives you resp.body, but fall back to resp.text just in case
-      const payload =
-        (resp && resp.body) ||
-        (resp && resp.text && JSON.parse(resp.text)) ||
-        {};
+  fetch(url)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then((payload) => {
       const items = Array.isArray(payload.items) ? payload.items : [];
       console.log(payload);
 
@@ -87,11 +81,11 @@ export function getEvents(propertyId, callback) {
       if (typeof callback === "function") {
         callback(events);
       }
-    } catch (parseError) {
-      console.error("Error parsing events response:", parseError);
+    })
+    .catch((error) => {
+      console.error("Error fetching events:", error);
       if (typeof callback === "function") callback([]);
-    }
-  });
+    });
 }
 
 /**

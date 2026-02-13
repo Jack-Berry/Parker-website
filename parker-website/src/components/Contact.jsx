@@ -35,7 +35,7 @@ const Contact = () => {
     e.preventDefault();
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/contact/${property.id}`,
+        `${import.meta.env.VITE_API_URL || 'https://holidayhomesandlets.co.uk'}/api/contact/${property.id}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

@@ -8,7 +8,9 @@ import logo from "../assets/HHAL Logo.png";
 
 const isBundledAsset = (url) =>
   typeof url === "string" &&
-  (url.startsWith("/static/") ||
+  (url.startsWith("/static/") || // webpack/CRA
+    url.startsWith("/assets/") || // Vite production
+    url.startsWith("/src/") || // Vite dev mode
     url.startsWith("data:") ||
     url.startsWith("http"));
 
@@ -43,6 +45,11 @@ const CardSlideshow = ({ images = [], logo }) => {
           aria-hidden="true"
         />
       ))}
+      {logo && (
+        <div className="ps-card-logo-overlay">
+          <img src={logo} alt="Property logo" />
+        </div>
+      )}
     </>
   );
 };
