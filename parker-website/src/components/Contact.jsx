@@ -5,6 +5,7 @@ import SeoHead from "./SEO/SeoHead";
 import {
   buildOrganizationSchema,
   buildBreadcrumbSchema,
+  buildContactMetaDescription,
 } from "./SEO/schema";
 import "../css/contact.scss";
 
@@ -57,7 +58,7 @@ const Contact = () => {
 
   // SEO content
   const seoTitle = `Contact | ${property.name} | Holiday Homes & Lets`;
-  const seoDescription = `Contact Holiday Homes & Lets about ${property.name}.`;
+  const seoDescription = buildContactMetaDescription(property);
   const orgSchema = buildOrganizationSchema();
   const breadcrumbSchema = buildBreadcrumbSchema([
     { name: "Home", path: "/" },

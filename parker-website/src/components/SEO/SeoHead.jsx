@@ -3,13 +3,30 @@ import { Helmet } from "react-helmet-async";
 
 const BASE_URL = "https://www.holidayhomesandlets.co.uk";
 
-/**
- * Reusable head manager for SEO:
- * - <title>
- * - meta description
- * - canonical URL
- * - JSON-LD schema (later)
- */
+function normalizeCanonicalPath(path) {
+  if (!path) return "/";
+
+  // Ensure it starts with "/"
+  let p = path.startsWith("/") ? path : `/${path}`;
+
+  // Root stays as "/"
+  if (p === "/") return "/";
+
+  // If it has a query/hash, don't try to “fix” it here (canonicals should generally not include them)
+  const hasQueryOrHash = p.includes("?") || p.includes("#");
+  if (hasQueryOrHash) return p;
+
+  // Add trailing slash to match your server behaviour: "/about" => "/about/"
+  if (!p.endsWith("/")) p = `${p}/`;
+
+  return p;
+}
+
+function buildCanonicalUrl(canonicalPath) {
+  const normalizedPath = normalizeCanonicalPath(canonicalPath);
+  return `${BASE_URL}${normalizedPath}`;
+}
+
 export default function SeoHead({
   title,
   description,
@@ -17,7 +34,7 @@ export default function SeoHead({
   jsonLd,
   robots,
 }) {
-  const canonicalUrl = canonicalPath ? `${BASE_URL}${canonicalPath}` : BASE_URL;
+  const canonicalUrl = buildCanonicalUrl(canonicalPath);
 
   return (
     <Helmet>

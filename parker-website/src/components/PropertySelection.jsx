@@ -65,7 +65,7 @@ const PropertySelection = () => {
     <>
       <SeoHead
         title="Holiday Homes & Lets | Book Direct Holiday Homes"
-        description="Book direct holiday homes in Wales and England with Holiday Homes & Lets. Browse properties and check availability."
+        description="Book direct holiday homes with Holiday Homes & Lets. Pet-friendly cottages in Anglesey & Dorset. No booking fees, best rates. Browse properties & check availability."
         canonicalPath="/"
         jsonLd={jsonLd}
       />

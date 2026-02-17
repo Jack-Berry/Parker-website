@@ -7,6 +7,7 @@ import {
   buildOrganizationSchema,
   buildBreadcrumbSchema,
   buildVacationRentalSchema,
+  buildPropertyMetaDescription,
 } from "./SEO/schema";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
@@ -371,7 +372,7 @@ const Home = () => {
 
   // SEO content
   const seoTitle = `${property.name} | Book Direct | Holiday Homes & Lets`;
-  const seoDescription = `Book ${property.name} direct with Holiday Homes & Lets. Check availability and book online.`;
+  const seoDescription = buildPropertyMetaDescription(property);
   const orgSchema = buildOrganizationSchema();
   const breadcrumbSchema = buildBreadcrumbSchema([
     { name: "Home", path: "/" },

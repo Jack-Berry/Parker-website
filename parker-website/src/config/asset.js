@@ -1,6 +1,6 @@
 // Vite asset resolver using import.meta.glob
-// Eagerly imports all image files from src/assets at build time
-const modules = import.meta.glob('../assets/**/*.{png,jpg,jpeg,gif,svg,webp}', {
+// Eagerly imports all asset files from src/assets at build time
+const modules = import.meta.glob('../assets/**/*.{png,jpg,jpeg,gif,svg,webp,otf,ttf,woff,woff2}', {
   eager: true,
   import: 'default'
 });
