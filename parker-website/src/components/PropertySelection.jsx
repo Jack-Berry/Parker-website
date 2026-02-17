@@ -14,11 +14,15 @@ const isBundledAsset = (url) =>
     url.startsWith("data:") ||
     url.startsWith("http"));
 
-/** Slideshow media for a property card (slow cross-fade) */
-const CardSlideshow = ({ images = [], logo }) => {
+/** Slideshow media for a property card (slow cross-fade).
+ *  Shows thumbnails instantly and swaps in full-size images as they load. */
+const CardSlideshow = ({ images = [], thumbnails = [], logo }) => {
   const slides = useMemo(() => images.filter(isBundledAsset), [images]);
+  const thumbSlides = useMemo(() => thumbnails.filter(isBundledAsset), [thumbnails]);
 
   const [idx, setIdx] = useState(0);
+  // Track which full-size images have finished loading
+  const [loaded, setLoaded] = useState({});
 
   useEffect(() => {
     if (!slides.length) return;
@@ -26,8 +30,27 @@ const CardSlideshow = ({ images = [], logo }) => {
     return () => clearInterval(id);
   }, [slides.length]);
 
+  // Progressively load full-size images: first the current slide, then the rest
+  useEffect(() => {
+    if (!slides.length) return;
+    // Load current slide first, then next, then remaining
+    const order = [idx, (idx + 1) % slides.length];
+    slides.forEach((_, i) => { if (!order.includes(i)) order.push(i); });
+
+    order.forEach((i, delay) => {
+      if (loaded[i]) return;
+      const img = new Image();
+      img.onload = () => setLoaded((prev) => ({ ...prev, [i]: true }));
+      // Stagger non-current images slightly so current loads first
+      if (i === idx) {
+        img.src = slides[i];
+      } else {
+        setTimeout(() => { img.src = slides[i]; }, delay * 200);
+      }
+    });
+  }, [idx, slides]);
+
   if (!slides.length) {
-    // Fallback: static logo or placeholder
     return logo ? (
       <img src={logo} alt="Property logo" className="ps-card-logo" />
     ) : (
@@ -37,14 +60,29 @@ const CardSlideshow = ({ images = [], logo }) => {
 
   return (
     <>
-      {slides.map((src, i) => (
-        <div
-          key={src}
-          className={`ps-card-bg ${i === idx ? "visible" : ""}`}
-          style={{ backgroundImage: `url(${src})` }}
-          aria-hidden="true"
-        />
-      ))}
+      {slides.map((src, i) => {
+        const thumbSrc = thumbSlides[i];
+        const isActive = i === idx;
+        const hasLoaded = loaded[i];
+        return (
+          <div key={src} className={`ps-card-bg ${isActive ? "visible" : ""}`} aria-hidden="true">
+            {/* Thumbnail layer – instant */}
+            {thumbSrc && (
+              <div
+                className="ps-card-bg-layer"
+                style={{ backgroundImage: `url(${thumbSrc})` }}
+              />
+            )}
+            {/* Full-size layer – fades in once loaded */}
+            {hasLoaded && (
+              <div
+                className="ps-card-bg-layer ps-card-bg-full"
+                style={{ backgroundImage: `url(${src})` }}
+              />
+            )}
+          </div>
+        );
+      })}
       {logo && (
         <div className="ps-card-logo-overlay">
           <img src={logo} alt="Property logo" />
@@ -55,6 +93,19 @@ const CardSlideshow = ({ images = [], logo }) => {
 };
 
 const PropertySelection = () => {
+  // Preload topbar + welcome images for every property so they appear
+  // instantly when the user navigates to a property page
+  useEffect(() => {
+    PROPERTY_LIST.forEach((p) => {
+      [p.images?.topbar, p.images?.welcomeTo].forEach((src) => {
+        if (src) {
+          const img = new Image();
+          img.src = src;
+        }
+      });
+    });
+  }, []);
+
   const orgSchema = buildOrganizationSchema();
   const jsonLd = {
     "@context": "https://schema.org",
@@ -83,14 +134,17 @@ const PropertySelection = () => {
 
         <div className="ps-grid ps-grid--two">
           {PROPERTY_LIST.map((property) => {
-            // Prefer hero images; if empty, fall back to a handful from gallery
             const hero = Array.isArray(property.images?.hero)
               ? property.images.hero
+              : [];
+            const heroThumbs = Array.isArray(property.images?.heroThumbnails)
+              ? property.images.heroThumbnails
               : [];
             const gallery = Array.isArray(property.images?.gallery)
               ? property.images.gallery
               : [];
             const media = hero.length ? hero : gallery.slice(0, 6);
+            const thumbs = heroThumbs.length ? heroThumbs : [];
             const logo = property.images?.logo || null;
 
             return (
@@ -100,7 +154,7 @@ const PropertySelection = () => {
                 className="ps-card panel"
               >
                 <div className="ps-card-media">
-                  <CardSlideshow images={media} logo={logo} />
+                  <CardSlideshow images={media} thumbnails={thumbs} logo={logo} />
                 </div>
 
                 <div className="ps-card-body">

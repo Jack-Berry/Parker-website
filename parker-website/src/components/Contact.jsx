@@ -85,6 +85,7 @@ const Contact = () => {
             src={property.images.topbar}
             className="topbar"
             alt={`${property.name} top bar`}
+            fetchpriority="high"
           />
         )}
         <div className="contact-content">

@@ -23,9 +23,10 @@ const Todo = () => {
         if (Array.isArray(s.images) && s.images.length) {
           images = s.images; // explicit URLs provided
         } else if (s.imageFilter) {
-          images = gallery.filter((img) =>
-            img.toLowerCase().includes(s.imageFilter.toLowerCase())
-          );
+          images = gallery.filter((img) => {
+            const src = typeof img === "object" ? img.original : img;
+            return (src || "").toLowerCase().includes(s.imageFilter.toLowerCase());
+          });
         }
         if (!images.length) images = gallery.slice(0, 6); // graceful fallback
 
@@ -103,6 +104,7 @@ const Todo = () => {
             src={property.images.topbar}
             className="topbar"
             alt={`${property.name} top bar`}
+            fetchpriority="high"
           />
         )}
 
@@ -157,7 +159,7 @@ const AutoTransitionSection = ({
             className={`todo-background-image ${
               index === currentImageIndex ? "visible" : ""
             }`}
-            style={{ backgroundImage: `url(${img})` }}
+            style={{ backgroundImage: `url(${typeof img === "object" ? img.original : img})` }}
           ></div>
         ))}
         <h2>{title}</h2>

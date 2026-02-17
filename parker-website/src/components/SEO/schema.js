@@ -221,7 +221,7 @@ export function buildVacationRentalSchema(property) {
     : [];
 
   const imageList = rawImages
-    .map((u) => safeString(u))
+    .map((u) => safeString(typeof u === "object" ? u.original : u))
     .filter(Boolean)
     .map((u) => (u.startsWith("http") ? u : `${BASE_URL}${u}`))
     .slice(0, 8); // Google recommends at least 8 images

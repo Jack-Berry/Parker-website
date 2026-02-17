@@ -17,7 +17,6 @@ import { eachDayOfInterval, parseISO, differenceInDays } from "date-fns";
 import { API_BASE_URL, getEvents } from "../utils/fetch";
 import Button from "./Button.jsx";
 import ContactForm from "./ContactForm.jsx";
-import { Spinner } from "react-bootstrap";
 
 const Home = () => {
   const { propertySlug } = useParams();
@@ -66,6 +65,29 @@ const Home = () => {
       setLoading(false);
     });
   }, [property?.id, property]); // safe dependency usage
+
+
+  // Preload adjacent-page images (topbar + welcome) so they appear instantly on navigation
+  useEffect(() => {
+    [property.images?.topbar, property.images?.welcomeTo]
+      .filter(Boolean)
+      .forEach((src) => { new Image().src = src; });
+
+    // Preload the first image of each Todo guide section so the What To Do
+    // page appears to load instantly when navigated to
+    const gallery = property.images?.gallery || [];
+    (property.guide?.sections || []).forEach((s) => {
+      if (!s.imageFilter) return;
+      const match = gallery.find((img) => {
+        const src = typeof img === "object" ? img.original : img;
+        return (src || "").toLowerCase().includes(s.imageFilter.toLowerCase());
+      });
+      if (match) {
+        const src = typeof match === "object" ? match.original : match;
+        new Image().src = src;
+      }
+    });
+  }, [property]);
 
   // Background slideshow
   useEffect(() => {
@@ -418,20 +440,15 @@ const Home = () => {
           )}
           <h1>Welcome to {property.name}</h1>
 
-          {loading ? (
-            <div className="loading-placeholder">
-              <Spinner animation="border" variant="light" />
-              <p>Getting dates...</p>
-            </div>
-          ) : (
-            <>
-              <DateRange
-                ranges={dateRange}
-                onChange={handleSelect}
-                disabledDay={isDisabledDate}
-                dayContentRenderer={customDayContentRenderer}
-              />
+          <DateRange
+            ranges={dateRange}
+            onChange={handleSelect}
+            disabledDay={isDisabledDate}
+            dayContentRenderer={customDayContentRenderer}
+          />
 
+          {!loading && (
+            <>
               {toggle && (
                 <div className="contact-form-container">
                   {formSubmitted ? (

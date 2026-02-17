@@ -42,24 +42,25 @@ const About = () => {
       "activity-",
     ];
 
-    const filtered = gallery.filter((src) => {
-      const srcLower = src.toLowerCase();
+    const filtered = gallery.filter((item) => {
+      const src = typeof item === "object" ? item.original : item;
+      const srcLower = (src || "").toLowerCase();
       // Exclude any image with guide keywords
       return !guideKeywords.some((keyword) => srcLower.includes(keyword));
     });
 
-    return filtered.map((src) => ({ original: src, thumbnail: src }));
+    return filtered.map((item) =>
+      typeof item === "string" ? { original: item, thumbnail: item } : item,
+    );
   }, [property]);
 
-  // Preload images for smoother UX (no-op if none)
+  // Preload thumbnails only – full-size originals load on demand when the
+  // user clicks an image (lightbox) or switches to carousel view.
   useEffect(() => {
-    const preloadImages = (items) => {
-      items.forEach(({ original }) => {
-        const img = new Image();
-        img.src = original;
-      });
-    };
-    if (images.length) preloadImages(images);
+    images.forEach(({ thumbnail }) => {
+      const img = new Image();
+      img.src = thumbnail;
+    });
   }, [images]);
 
   // Responsive default view: carousel on small screens, grid on desktop
@@ -154,6 +155,7 @@ const About = () => {
             src={property.images.topbar}
             className="topbar"
             alt={`${property.name} top bar`}
+            fetchpriority="high"
           />
         )}
 
@@ -167,6 +169,7 @@ const About = () => {
                   src={property.images.welcomeTo}
                   className="welcome-to"
                   alt="Welcome"
+                  fetchpriority="high"
                 />
               )}
             </div>
