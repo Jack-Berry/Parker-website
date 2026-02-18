@@ -21,8 +21,6 @@ const Footer = () => {
   const adminHref = "/admin";
 
   const handleOwnerLogin = () => {
-    console.log("Footer - propertySlug:", propertySlug);
-    console.log("Footer - property:", property);
     navigate(adminHref, { state: { propertySlug } });
   };
 

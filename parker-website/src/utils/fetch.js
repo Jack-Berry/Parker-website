@@ -39,8 +39,6 @@ export function getEvents(propertyId, callback) {
 
   const url = `${API_BASE_URL}/api/events/${propertyId}`;
 
-  console.log("Fetching events from URL:", url);
-
   fetch(url)
     .then((response) => {
       if (!response.ok) {
@@ -50,7 +48,6 @@ export function getEvents(propertyId, callback) {
     })
     .then((payload) => {
       const items = Array.isArray(payload.items) ? payload.items : [];
-      console.log(payload);
 
       const events = items
         .map((event) => {
@@ -63,12 +60,6 @@ export function getEvents(propertyId, callback) {
             console.warn("Skipping invalid event:", event);
             return null;
           }
-
-          console.log("Parsed event:", {
-            title: event.summary,
-            start,
-            end,
-          });
 
           return {
             start,

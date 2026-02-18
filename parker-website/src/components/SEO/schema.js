@@ -297,16 +297,6 @@ export function buildVacationRentalSchema(property) {
 
     ...(typeof petsAllowed === "boolean" ? { petsAllowed } : {}),
 
-    ...(Number.isFinite(sleeps)
-      ? { occupancy: { "@type": "QuantitativeValue", value: sleeps } }
-      : {}),
-
-    ...(Number.isFinite(bedrooms) ? { numberOfBedrooms: bedrooms } : {}),
-
-    ...(Number.isFinite(bathrooms)
-      ? { numberOfBathroomsTotal: bathrooms }
-      : {}),
-
     potentialAction: {
       "@type": "ReserveAction",
       target: {

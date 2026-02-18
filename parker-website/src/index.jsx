@@ -22,20 +22,21 @@ import Nav from "./components/Nav";
 import Admin from "./components/Admin";
 import Login from "./components/Login";
 import PropertySelection from "./components/PropertySelection";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 /* ---------- Utility Components ---------- */
 
-// Hide footer on specific paths (already existed)
+// Hide footer on specific paths
 const FooterWithCondition = () => {
   const location = useLocation();
   const hideFooterOnPaths = ["/", "/admin", "/login"];
   return hideFooterOnPaths.includes(location.pathname) ? null : <Footer />;
 };
 
-// Hide nav on specific paths (NEW)
+// Hide nav on specific paths
 const NavWithCondition = () => {
   const location = useLocation();
-  const hideNavOnPaths = ["/", "/login", "/admin"]; // add others if needed
+  const hideNavOnPaths = ["/", "/login", "/admin"];
   return hideNavOnPaths.includes(location.pathname) ? null : <Nav />;
 };
 
@@ -80,9 +81,11 @@ const App = () => {
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <HelmetProvider>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    <ErrorBoundary>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </ErrorBoundary>
   </HelmetProvider>,
 );
 

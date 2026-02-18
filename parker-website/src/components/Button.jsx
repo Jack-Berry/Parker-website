@@ -8,7 +8,7 @@ const Button = ({ onClick, text, className }) => {
   };
 
   return (
-    <button className={`btn ${className}`} onClick={(e) => handleClick(e)}>
+    <button type="button" className={`btn ${className}`} onClick={(e) => handleClick(e)}>
       {text}
     </button>
   );

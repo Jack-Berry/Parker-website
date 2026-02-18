@@ -66,14 +66,14 @@ const CardSlideshow = ({ images = [], thumbnails = [], logo }) => {
         const hasLoaded = loaded[i];
         return (
           <div key={src} className={`ps-card-bg ${isActive ? "visible" : ""}`} aria-hidden="true">
-            {/* Thumbnail layer – instant */}
+            {/* Thumbnail layer - instant */}
             {thumbSrc && (
               <div
                 className="ps-card-bg-layer"
                 style={{ backgroundImage: `url(${thumbSrc})` }}
               />
             )}
-            {/* Full-size layer – fades in once loaded */}
+            {/* Full-size layer - fades in once loaded */}
             {hasLoaded && (
               <div
                 className="ps-card-bg-layer ps-card-bg-full"

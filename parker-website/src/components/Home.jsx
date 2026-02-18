@@ -1,5 +1,4 @@
-// src/components/Home.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, Navigate } from "react-router-dom";
 import { getPropertyBySlug } from "../config/properties";
 import SeoHead from "./SEO/SeoHead";
@@ -53,8 +52,10 @@ const Home = () => {
       property?.pricing?.discounts,
   );
   const [appliedDiscount, setAppliedDiscount] = useState(null);
+  const [bookingError, setBookingError] = useState("");
 
   const images = property?.images?.hero || [];
+  const priceDebounceRef = useRef(null);
 
   // Fetch bookings for this property
   useEffect(() => {
@@ -64,7 +65,7 @@ const Home = () => {
       setBookings(fetchedEvents || []);
       setLoading(false);
     });
-  }, [property?.id, property]); // safe dependency usage
+  }, [property?.id, property]);
 
 
   // Preload adjacent-page images (topbar + welcome) so they appear instantly on navigation
@@ -98,7 +99,7 @@ const Home = () => {
     return () => clearInterval(interval);
   }, [images]);
 
-  // Recalculate price when numberOfPets changes (for security deposit properties)
+  // Recalculate price when numberOfPets changes (debounced to avoid rapid API calls)
   useEffect(() => {
     if (
       property?.pricing?.type === "security_deposit" &&
@@ -106,13 +107,17 @@ const Home = () => {
       formData.endDate &&
       formData.numberOfPets !== ""
     ) {
-      const petsCount = parseInt(formData.numberOfPets) || 0;
-      fetchTotalPrice(
-        formData.startDate.split("T")[0],
-        formData.endDate.split("T")[0],
-        petsCount,
-      );
+      clearTimeout(priceDebounceRef.current);
+      priceDebounceRef.current = setTimeout(() => {
+        const petsCount = parseInt(formData.numberOfPets) || 0;
+        fetchTotalPrice(
+          formData.startDate.split("T")[0],
+          formData.endDate.split("T")[0],
+          petsCount,
+        );
+      }, 300);
     }
+    return () => clearTimeout(priceDebounceRef.current);
   }, [formData.numberOfPets, formData.startDate, formData.endDate, property]);
 
   // Validate propertySlug (after all hooks)
@@ -223,7 +228,6 @@ const Home = () => {
         end: newRange.endDate,
       }).some(isDisabledDate)
     ) {
-      console.log("FAIL: Contains disabled dates.");
       setDateRange([
         {
           startDate: new Date(),
@@ -246,7 +250,6 @@ const Home = () => {
         setShowDealsInfo(true);
       }
     } else {
-      console.log("PASS");
       setDateRange([newRange]);
       setFormData((prev) => ({
         ...prev,
@@ -285,7 +288,8 @@ const Home = () => {
       !endDate ||
       startDate.toDateString() === new Date().toDateString()
     ) {
-      alert("Please select a valid date range before proceeding.");
+      setBookingError("Please select a valid date range before proceeding.");
+      setTimeout(() => setBookingError(""), 5000);
       return;
     }
 
@@ -293,12 +297,14 @@ const Home = () => {
     const numNights = differenceInDays(endDate, startDate);
     const minimumNights = property.pricing?.minimumNights || 1;
     if (numNights < minimumNights) {
-      alert(
+      setBookingError(
         `Minimum stay is ${minimumNights} night${minimumNights > 1 ? "s" : ""}.`,
       );
+      setTimeout(() => setBookingError(""), 5000);
       return;
     }
 
+    setBookingError("");
     setToggle(!toggle);
   };
 
@@ -353,7 +359,8 @@ const Home = () => {
       }, 2000);
     } catch (error) {
       console.error("Error submitting booking:", error);
-      alert("An error occurred. Please try again.");
+      setBookingError("An error occurred. Please try again.");
+      setTimeout(() => setBookingError(""), 5000);
     }
   };
 
@@ -366,8 +373,37 @@ const Home = () => {
       day >= dateRange[0].startDate && day <= dateRange[0].endDate;
 
     let borderRadius = "0";
-    if (isStart) borderRadius = "20% 0 0 20%";
-    if (isEnd) borderRadius = "0 20% 20% 0";
+
+    let lineSize = "100%";
+    let linePosition = "center";
+
+    if (isDisabled) {
+      const prevDay = new Date(day);
+      prevDay.setDate(prevDay.getDate() - 1);
+      const nextDay = new Date(day);
+      nextDay.setDate(nextDay.getDate() + 1);
+      const prevDisabled = isDisabledDate(prevDay);
+      const nextDisabled = isDisabledDate(nextDay);
+
+      if (!prevDisabled && !nextDisabled) {
+        borderRadius = "20%";
+        lineSize = "80%";
+      } else if (!prevDisabled) {
+        borderRadius = "20% 0 0 20%";
+        lineSize = "90%";
+        linePosition = "right";
+      } else if (!nextDisabled) {
+        borderRadius = "0 20% 20% 0";
+        lineSize = "90%";
+        linePosition = "left";
+      }
+    } else if (isStart && isEnd) {
+      borderRadius = "20%";
+    } else if (isStart) {
+      borderRadius = "20% 0 0 20%";
+    } else if (isEnd) {
+      borderRadius = "0 20% 20% 0";
+    }
 
     return (
       <div
@@ -385,6 +421,17 @@ const Home = () => {
               : "inherit",
           color: isDisabled ? "white" : isSelected ? "white" : "inherit",
           borderRadius,
+          ...(isDisabled
+            ? {
+                backgroundImage: "linear-gradient(transparent 45%, rgba(0,0,0,0.7) 45%, rgba(0,0,0,0.7) 55%, transparent 55%)",
+                backgroundSize: `${lineSize} 100%`,
+                backgroundPosition: linePosition,
+                backgroundRepeat: "no-repeat",
+              }
+            : {}),
+          ...(isSelected && !isDisabled
+            ? { outline: "2px solid #005500", outlineOffset: "-2px" }
+            : {}),
         }}
       >
         {day.getDate()}
@@ -584,6 +631,11 @@ const Home = () => {
                 </div>
               )}
 
+              {bookingError && (
+                <p style={{ color: "red", textAlign: "center", margin: "10px 0" }}>
+                  {bookingError}
+                </p>
+              )}
               <Button onClick={handleBooking} text="Next" className="btn" />
             </>
           )}

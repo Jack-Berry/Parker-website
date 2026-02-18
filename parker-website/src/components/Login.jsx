@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import SeoHead from "./SEO/SeoHead";
 import "../css/admin.scss";
 import { PROPERTIES, getPropertyBySlug } from "../config/properties";
+import { API_BASE_URL } from "../utils/fetch";
 
 const Login = ({ setToken }) => {
   const [username, setUsername] = useState("");
@@ -26,7 +27,7 @@ const Login = ({ setToken }) => {
     setSubmitting(true);
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL || 'https://holidayhomesandlets.co.uk'}/api/login`, {
+      const res = await fetch(`${API_BASE_URL}/api/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
@@ -47,7 +48,7 @@ const Login = ({ setToken }) => {
         localStorage.setItem("displayName", data.displayName);
       }
 
-      // Store token via parent state; ProtectedRoute persists it to localStorage.
+      // Store token via parent state; ProtectedRoute persists it to localStorage
       setToken(data.token);
     } catch (err) {
       console.error("Login error:", err);

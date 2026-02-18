@@ -54,7 +54,7 @@ const About = () => {
     );
   }, [property]);
 
-  // Preload thumbnails only – full-size originals load on demand when the
+  // Preload thumbnails only - full-size originals load on demand when the
   // user clicks an image (lightbox) or switches to carousel view.
   useEffect(() => {
     images.forEach(({ thumbnail }) => {
@@ -65,16 +65,19 @@ const About = () => {
 
   // Responsive default view: carousel on small screens, grid on desktop
   useEffect(() => {
+    let timer;
     const handleResize = () => {
-      if (window.innerWidth < 850) {
-        setView("carousel");
-      } else {
-        setView("grid");
-      }
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        setView(window.innerWidth < 850 ? "carousel" : "grid");
+      }, 150);
     };
-    handleResize(); // initial
+    handleResize();
     window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("resize", handleResize);
+    };
   }, []);
 
   // Validate propertySlug (after all hooks)

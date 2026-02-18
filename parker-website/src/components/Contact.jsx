@@ -8,6 +8,7 @@ import {
   buildContactMetaDescription,
 } from "./SEO/schema";
 import "../css/contact.scss";
+import { API_BASE_URL } from "../utils/fetch";
 
 const Contact = () => {
   const { propertySlug } = useParams();
@@ -36,7 +37,7 @@ const Contact = () => {
     e.preventDefault();
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL || 'https://holidayhomesandlets.co.uk'}/api/contact/${property.id}`,
+        `${API_BASE_URL}/api/contact/${property.id}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

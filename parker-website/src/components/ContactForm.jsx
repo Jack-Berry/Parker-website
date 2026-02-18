@@ -11,7 +11,7 @@ const ContactForm = ({ formData, handleChange }) => {
         dateText = `You are booking from ${start.toLocaleDateString()} - ${end.toLocaleDateString()}.`;
       }
     } catch {
-      // silently ignore; dateText stays empty
+      // Ignore; dateText stays empty
     }
   }
 
@@ -44,6 +44,7 @@ const ContactForm = ({ formData, handleChange }) => {
           required
           className="contact-input"
           min="1"
+          max="20"
         />
       </div>
 
@@ -57,6 +58,7 @@ const ContactForm = ({ formData, handleChange }) => {
           onChange={handleChange}
           className="contact-input"
           min="0"
+          max="10"
         />
       </div>
 

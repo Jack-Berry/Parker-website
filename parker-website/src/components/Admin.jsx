@@ -17,6 +17,8 @@ const Admin = ({ onLogout }) => {
   const [currentMonth, setCurrentMonth] = useState(moment());
   const [monthFilter, setMonthFilter] = useState("all");
   const [sortBy, setSortBy] = useState("date-asc");
+  const [adminMessage, setAdminMessage] = useState(null);
+  const [busyAction, setBusyAction] = useState(null);
 
   // Get auth data from localStorage
   const token = localStorage.getItem("token");
@@ -35,7 +37,6 @@ const Admin = ({ onLogout }) => {
       cleanupOldPrices()
         .catch((err) => {
           // Silently fail if cleanup errors - not critical
-          console.log("Cleanup skipped:", err);
         })
         .finally(() => {
           // Always fetch prices regardless of cleanup success
@@ -54,11 +55,15 @@ const Admin = ({ onLogout }) => {
 
   const handleAuthError = (response) => {
     if (response.status === 401 || response.status === 403) {
-      // Token expired or invalid - trigger logout
       onLogout();
       return true;
     }
     return false;
+  };
+
+  const showMessage = (text, type = "success") => {
+    setAdminMessage({ text, type });
+    setTimeout(() => setAdminMessage(null), 3000);
   };
 
   const cleanupOldPrices = async () => {
@@ -72,47 +77,42 @@ const Admin = ({ onLogout }) => {
         headers: getAuthHeaders(),
       });
       if (!handleAuthError(response)) {
-        const data = await response.json();
-        console.log("Cleaned up old prices:", data);
+        await response.json();
       }
     } catch (err) {
       console.error("Error cleaning up old prices:", err);
     }
   };
 
-  const fetchPrices = () => {
+  const fetchPrices = async () => {
     setIsLoading(true);
-    // Use propertyId in URL if available, otherwise let backend use default
     const url = propertyId ? `/api/prices/${propertyId}` : "/api/prices";
-
-    // Add timestamp to prevent caching
     const cacheBuster = `?t=${Date.now()}`;
 
-    fetch(url + cacheBuster, {
-      headers: {
-        ...getAuthHeaders(),
-        "Cache-Control": "no-cache, no-store, must-revalidate",
-        Pragma: "no-cache",
-        Expires: "0",
-      },
-    })
-      .then((res) => {
-        if (handleAuthError(res)) return;
-        return res.json();
-      })
-      .then((data) => {
-        if (data) {
-          setStandardPrice(data.standardPrice);
-          setWeekendPrice(data.weekendPrice || data.standardPrice);
-          setDatePrices(data.datePrices);
-        }
-      })
-      .catch((err) => console.error("Error fetching prices:", err))
-      .finally(() => setIsLoading(false));
+    try {
+      const res = await fetch(url + cacheBuster, {
+        headers: {
+          ...getAuthHeaders(),
+          "Cache-Control": "no-cache, no-store, must-revalidate",
+          Pragma: "no-cache",
+          Expires: "0",
+        },
+      });
+      if (handleAuthError(res)) return;
+      const data = await res.json();
+      if (data) {
+        setStandardPrice(data.standardPrice);
+        setWeekendPrice(data.weekendPrice || data.standardPrice);
+        setDatePrices(data.datePrices);
+      }
+    } catch (err) {
+      console.error("Error fetching prices:", err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleDateSelect = ({ start, end }) => {
-    console.log("Selection start:", start, "end:", end);
     const startDate = moment(start).startOf("day");
     const endDate = moment(end).startOf("day").subtract(1, "seconds");
 
@@ -141,75 +141,83 @@ const Admin = ({ onLogout }) => {
 
   const clearSelection = () => setSelectedDates([]);
 
-  const updateStandardPrice = () => {
+  const updateStandardPrice = async () => {
+    setBusyAction("standard");
     const url = propertyId
       ? `/api/prices/standard/${propertyId}`
       : "/api/prices/standard";
 
-    fetch(url, {
-      method: "PUT",
-      headers: getAuthHeaders(),
-      body: JSON.stringify({ price: standardPrice }),
-    })
-      .then((res) => {
-        if (handleAuthError(res)) return;
-        return res.json();
-      })
-      .then(() => {
-        alert("Standard price updated!");
-        // Small delay to ensure DB commit, then fetch fresh data
-        setTimeout(() => fetchPrices(), 300);
-      })
-      .catch((err) => console.error("Error updating standard price:", err));
+    try {
+      const res = await fetch(url, {
+        method: "PUT",
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ price: standardPrice }),
+      });
+      if (handleAuthError(res)) return;
+      await res.json();
+      showMessage("Standard price updated!");
+      setTimeout(() => fetchPrices(), 300);
+    } catch (err) {
+      console.error("Error updating standard price:", err);
+      showMessage("Failed to update standard price.", "error");
+    } finally {
+      setBusyAction(null);
+    }
   };
 
-  const updateWeekendPrice = () => {
+  const updateWeekendPrice = async () => {
+    setBusyAction("weekend");
     const url = propertyId
       ? `/api/prices/weekend/${propertyId}`
       : "/api/prices/weekend";
 
-    fetch(url, {
-      method: "PUT",
-      headers: getAuthHeaders(),
-      body: JSON.stringify({ price: weekendPrice }),
-    })
-      .then((res) => {
-        if (handleAuthError(res)) return;
-        return res.json();
-      })
-      .then(() => {
-        alert("Weekend price updated!");
-        setTimeout(() => fetchPrices(), 300);
-      })
-      .catch((err) => console.error("Error updating weekend price:", err));
+    try {
+      const res = await fetch(url, {
+        method: "PUT",
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ price: weekendPrice }),
+      });
+      if (handleAuthError(res)) return;
+      await res.json();
+      showMessage("Weekend price updated!");
+      setTimeout(() => fetchPrices(), 300);
+    } catch (err) {
+      console.error("Error updating weekend price:", err);
+      showMessage("Failed to update weekend price.", "error");
+    } finally {
+      setBusyAction(null);
+    }
   };
 
-  const clearMonthPrices = () => {
+  const clearMonthPrices = async () => {
     const monthYear = currentMonth.format("YYYY-MM");
     const confirmMsg = `Delete all custom prices for ${currentMonth.format("MMMM YYYY")}?`;
 
     if (!window.confirm(confirmMsg)) return;
 
+    setBusyAction("clearMonth");
     const url = propertyId
       ? `/api/prices/clear-month/${propertyId}/${monthYear}`
       : `/api/prices/clear-month/${monthYear}`;
 
-    fetch(url, {
-      method: "DELETE",
-      headers: getAuthHeaders(),
-    })
-      .then((res) => {
-        if (handleAuthError(res)) return;
-        return res.json();
-      })
-      .then(() => {
-        alert(`Cleared all prices for ${currentMonth.format("MMMM YYYY")}`);
-        setTimeout(() => fetchPrices(), 300);
-      })
-      .catch((err) => console.error("Error clearing month:", err));
+    try {
+      const res = await fetch(url, {
+        method: "DELETE",
+        headers: getAuthHeaders(),
+      });
+      if (handleAuthError(res)) return;
+      await res.json();
+      showMessage(`Cleared all prices for ${currentMonth.format("MMMM YYYY")}`);
+      setTimeout(() => fetchPrices(), 300);
+    } catch (err) {
+      console.error("Error clearing month:", err);
+      showMessage("Failed to clear month prices.", "error");
+    } finally {
+      setBusyAction(null);
+    }
   };
 
-  const deleteSingleDate = (date) => {
+  const deleteSingleDate = async (date) => {
     if (
       !window.confirm(
         `Delete custom price for ${moment(date).format("DD/MM/YYYY")}?`,
@@ -217,54 +225,60 @@ const Admin = ({ onLogout }) => {
     )
       return;
 
+    setBusyAction(`delete-${date}`);
     const url = propertyId
       ? `/api/prices/${propertyId}/${date}`
       : `/api/prices/${date}`;
 
-    fetch(url, {
-      method: "DELETE",
-      headers: getAuthHeaders(),
-    })
-      .then((res) => {
-        if (handleAuthError(res)) return;
-        return res.json();
-      })
-      .then(() => {
-        setTimeout(() => fetchPrices(), 300);
-      })
-      .catch((err) => console.error("Error deleting date:", err));
+    try {
+      const res = await fetch(url, {
+        method: "DELETE",
+        headers: getAuthHeaders(),
+      });
+      if (handleAuthError(res)) return;
+      await res.json();
+      setTimeout(() => fetchPrices(), 300);
+    } catch (err) {
+      console.error("Error deleting date:", err);
+      showMessage("Failed to delete date price.", "error");
+    } finally {
+      setBusyAction(null);
+    }
   };
 
-  const updateSelectedDatesPrice = () => {
+  const updateSelectedDatesPrice = async () => {
     if (!selectedDates.length || !newPrice) {
-      alert("Select dates and enter a price.");
+      showMessage("Select dates and enter a price.", "error");
       return;
     }
 
+    setBusyAction("dates");
     const url = propertyId
       ? `/api/prices/date-range/${propertyId}`
       : "/api/prices/date-range";
 
-    fetch(url, {
-      method: "POST",
-      headers: getAuthHeaders(),
-      body: JSON.stringify({
-        dates: selectedDates,
-        price: newPrice,
-      }),
-    })
-      .then((res) => {
-        if (handleAuthError(res)) return;
-        return res.json();
-      })
-      .then((data) => {
-        if (data) {
-          setDatePrices(data.datePrices);
-          setSelectedDates([]);
-          setNewPrice("");
-        }
-      })
-      .catch((err) => console.error("Error updating date prices:", err));
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: getAuthHeaders(),
+        body: JSON.stringify({
+          dates: selectedDates,
+          price: newPrice,
+        }),
+      });
+      if (handleAuthError(res)) return;
+      const data = await res.json();
+      if (data) {
+        setDatePrices(data.datePrices);
+        setSelectedDates([]);
+        setNewPrice("");
+      }
+    } catch (err) {
+      console.error("Error updating date prices:", err);
+      showMessage("Failed to update date prices.", "error");
+    } finally {
+      setBusyAction(null);
+    }
   };
 
   const formatEvents = () => {
@@ -419,7 +433,7 @@ const Admin = ({ onLogout }) => {
     return filtered;
   };
 
-  const clearSelectedMonth = () => {
+  const clearSelectedMonth = async () => {
     if (monthFilter === "all") return;
 
     const monthName = moment(monthFilter, "YYYY-MM").format("MMMM YYYY");
@@ -427,24 +441,27 @@ const Admin = ({ onLogout }) => {
 
     if (!window.confirm(confirmMsg)) return;
 
+    setBusyAction("clearFiltered");
     const url = propertyId
       ? `/api/prices/clear-month/${propertyId}/${monthFilter}`
       : `/api/prices/clear-month/${monthFilter}`;
 
-    fetch(url, {
-      method: "DELETE",
-      headers: getAuthHeaders(),
-    })
-      .then((res) => {
-        if (handleAuthError(res)) return;
-        return res.json();
-      })
-      .then(() => {
-        alert(`Cleared all prices for ${monthName}`);
-        setMonthFilter("all");
-        setTimeout(() => fetchPrices(), 300);
-      })
-      .catch((err) => console.error("Error clearing month:", err));
+    try {
+      const res = await fetch(url, {
+        method: "DELETE",
+        headers: getAuthHeaders(),
+      });
+      if (handleAuthError(res)) return;
+      await res.json();
+      showMessage(`Cleared all prices for ${monthName}`);
+      setMonthFilter("all");
+      setTimeout(() => fetchPrices(), 300);
+    } catch (err) {
+      console.error("Error clearing month:", err);
+      showMessage("Failed to clear month prices.", "error");
+    } finally {
+      setBusyAction(null);
+    }
   };
 
   if (isLoading) {
@@ -478,6 +495,20 @@ const Admin = ({ onLogout }) => {
         </div>
       </div>
 
+      {adminMessage && (
+        <div style={{
+          padding: "10px 16px",
+          marginBottom: "16px",
+          borderRadius: "6px",
+          textAlign: "center",
+          fontWeight: "bold",
+          backgroundColor: adminMessage.type === "error" ? "#fdecea" : "#e8f5e9",
+          color: adminMessage.type === "error" ? "#c62828" : "#2e7d32",
+        }}>
+          {adminMessage.text}
+        </div>
+      )}
+
       <div className="pricing-section">
         <h2>Base Pricing</h2>
         <div className="pricing-row">
@@ -489,7 +520,9 @@ const Admin = ({ onLogout }) => {
               value={standardPrice}
               onChange={(e) => setStandardPrice(e.target.value)}
             />
-            <button onClick={updateStandardPrice}>Update</button>
+            <button onClick={updateStandardPrice} disabled={busyAction === "standard"}>
+              {busyAction === "standard" ? "Updating..." : "Update"}
+            </button>
           </div>
 
           <div className="pricing-input-group">
@@ -500,7 +533,9 @@ const Admin = ({ onLogout }) => {
               value={weekendPrice}
               onChange={(e) => setWeekendPrice(e.target.value)}
             />
-            <button onClick={updateWeekendPrice}>Update</button>
+            <button onClick={updateWeekendPrice} disabled={busyAction === "weekend"}>
+              {busyAction === "weekend" ? "Updating..." : "Update"}
+            </button>
           </div>
         </div>
       </div>
@@ -508,8 +543,8 @@ const Admin = ({ onLogout }) => {
       <div className="calendar-section">
         <div className="calendar-header">
           <h2>Manage Prices</h2>
-          <button onClick={clearMonthPrices} className="clear-month-btn">
-            Clear {currentMonth.format("MMMM")} Prices
+          <button onClick={clearMonthPrices} className="clear-month-btn" disabled={busyAction === "clearMonth"}>
+            {busyAction === "clearMonth" ? "Clearing..." : `Clear ${currentMonth.format("MMMM")} Prices`}
           </button>
         </div>
         <p className="help-text">
@@ -552,7 +587,9 @@ const Admin = ({ onLogout }) => {
             onChange={(e) => setNewPrice(e.target.value)}
             placeholder="Enter price for selected dates"
           />
-          <button onClick={updateSelectedDatesPrice}>Update Price</button>
+          <button onClick={updateSelectedDatesPrice} disabled={busyAction === "dates"}>
+            {busyAction === "dates" ? "Updating..." : "Update Price"}
+          </button>
           <button onClick={clearSelection}>Clear Selection</button>
         </div>
 
@@ -607,8 +644,9 @@ const Admin = ({ onLogout }) => {
               <button
                 onClick={clearSelectedMonth}
                 className="clear-filtered-month-btn"
+                disabled={busyAction === "clearFiltered"}
               >
-                Clear {moment(monthFilter, "YYYY-MM").format("MMMM")}
+                {busyAction === "clearFiltered" ? "Clearing..." : `Clear ${moment(monthFilter, "YYYY-MM").format("MMMM")}`}
               </button>
             )}
           </div>
@@ -650,8 +688,9 @@ const Admin = ({ onLogout }) => {
                           <button
                             onClick={() => deleteSingleDate(item.date)}
                             className="delete-btn"
+                            disabled={busyAction === `delete-${item.date}`}
                           >
-                            Delete
+                            {busyAction === `delete-${item.date}` ? "..." : "Delete"}
                           </button>
                         </td>
                       </tr>
