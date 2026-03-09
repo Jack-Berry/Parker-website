@@ -271,12 +271,11 @@ export const PROPERTIES = {
     location: {
       address: "Piddletrenthide, Dorset, England",
       coordinates: {
-        // Owner’s copy: 4 bed, 4 en-suite, sleeps 10, pet friendly.
-        // Coordinates here are still approximate – update when you have exact ones.
-        lat: 50.7833,
-        lng: -2.4833,
+        lat: 50.79679639822878,
+        lng: -2.421083730332461,
       },
-      mapEmbedUrl: null, // TODO: Get Google Maps embed URL
+      mapEmbedUrl:
+        "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d645.2402351280272!2d-2.421083730332461!3d50.79679639822878!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4872506b9e4f9835%3A0x58a9ec433c050a63!2sPiddle%20Inn%20Not%20the%20Ordinary!5e1!3m2!1sen!2suk!4v1773052772471!5m2!1sen!2suk",
     },
 
     // Capacity
@@ -576,6 +575,15 @@ export const PROPERTIES = {
     contact: {
       email: "dorset@holidayhomesandlets.co.uk",
       adminEmail: "dorset@holidayhomesandlets.co.uk",
+
+      // Shown in the footer as multiple lines
+      addressLines: [
+        "Piddle Inn",
+        "Piddletrenthide",
+        "Dorchester",
+        "Dorset",
+        "DT2 7QF",
+      ],
     },
 
     // Pricing rules (if property-specific)
