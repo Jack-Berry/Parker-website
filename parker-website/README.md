@@ -1,70 +1,109 @@
-# Getting Started with Create React App
+# Parker Website
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A multi-property holiday rental website for two UK properties. Built with React and Vite, it handles property showcasing, availability calendars, local guides, and guest inquiries.
 
-## Available Scripts
+## Properties
 
-In the project directory, you can run:
+- **Bwthyn Preswylfa** (Anglesey, Wales) - 2 bed, sleeps 6, coastal retreat
+- **Piddle Inn** (Piddletrenthide, Dorset) - 4 bed, sleeps 10, 300-year-old character inn
 
-### `npm start`
+## Tech Stack
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- React 18 + React Router v7
+- Vite 6
+- SCSS + Bootstrap 5
+- Node.js backend via CloudLinux Passenger
+- Hosted on HostPresto (LiteSpeed/cPanel)
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Getting Started
 
-### `npm test`
+Install dependencies:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```bash
+npm install
+```
 
-### `npm run build`
+Create a `.env` file with the required keys:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```
+VITE_GOOGLE_API_KEY=
+VITE_EMAILJS_SERVICE_ID=
+VITE_EMAILJS_TEMPLATE_ID=
+VITE_EMAILJS_USER_ID=
+VITE_API_URL=
+VITE_FORMSPREE_URL=
+VITE_TEMP_PASS=
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Run the dev server:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```bash
+npm run dev
+```
 
-### `npm run eject`
+The site will be available at `http://localhost:3000`.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## Building for Production
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```bash
+npm run build
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+This runs a Vite build followed by Puppeteer pre-rendering for 9 routes. The output goes to `build/`.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+To build without pre-rendering:
 
-## Learn More
+```bash
+npm run build:only
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+To run pre-rendering on its own:
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```bash
+npm run prerender
+```
 
-### Code Splitting
+## Project Structure
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+```
+src/
+  components/     React page and UI components
+  config/         Property data and asset resolver
+  assets/         Images for both properties, with thumbs/ subfolders
+  css/            SCSS stylesheets
+  utils/          API helpers
+  index.jsx       App entry point and routing
+scripts/
+  prerender.js    Puppeteer static HTML generation
+```
 
-### Analyzing the Bundle Size
+## Routes
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+| Path | Page |
+|------|------|
+| `/` | Property selection |
+| `/:propertySlug` | Property home |
+| `/:propertySlug/about` | Gallery and room details |
+| `/:propertySlug/what-to-do` | Local guide |
+| `/:propertySlug/contact` | Contact form |
+| `/admin/dashboard` | Admin panel (password protected) |
 
-### Making a Progressive Web App
+Property slugs are `preswylfa` and `piddle-inn`.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## Configuration
 
-### Advanced Configuration
+All property data lives in [src/config/properties.js](src/config/properties.js). This includes names, descriptions, amenities, images, pricing rules, and local guide sections. To add or update a property, this is the main file to edit.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+Images are resolved at build time via [src/config/asset.js](src/config/asset.js), which uses Vite's `import.meta.glob` to map asset paths. Gallery images are objects with `original` and `thumbnail` keys, not plain strings. Thumbnails are 400px copies stored in `thumbs/` subdirectories under each property's asset folder.
 
-### Deployment
+## Deployment
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+Upload the contents of `build/` to the hosting server after running `npm run build`. The `.htaccess` file on the server handles Passenger configuration and environment variables and is not tracked in this repo.
 
-### `npm run build` fails to minify
+LiteSpeed caches aggressively, so `index.html` should be served with `no-cache` headers to avoid stale deploys.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## Notes
+
+- `react-image-lightbox` requires `global: 'globalThis'` in `vite.config.js`, which is already set
+- Pre-rendering generates static HTML for the 9 main routes for SEO purposes
+- The admin panel is protected by a password stored in the `VITE_TEMP_PASS` env variable
